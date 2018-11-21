@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Yellow Beep Beep</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/floating-labels.css') }}">
+  <link rel="shortcut icon" href="#" />
+</head>
+<body>
+  <form class="form-app" action="" method="POST">
+    {{ form.hidden_tag() }}
+        <div class="text-center mb-4">
+          <h1 class="h3 mb-3 font-weight-normal">Beep Beep Login</h1>
+        </div>
+        <dl>
+         {% for field in form.display %}
+         <dt>{{ form[field].label }}</dt>
+         <dd>{{ form[field](class="form-control") }}</dd>
+           {% if form[field].errors %}
+              {% for e in form[field].errors %}
+               <p class="help-block">{{ e }}</p>
+              {% endfor %}
+           {% endif %}
+         {% endfor %}
+        </dl>
+        <input class="btn btn-lg btn-primary btn-block" type=submit value="Publish">
+        <p class="error">
+        {% for errmess in get_flashed_messages(False,['error']) %}
+                    <br>{{ errmess }}
+          {% endfor%}</p>
+  </form>
+ </body>
+</html>

@@ -1,5 +1,5 @@
 import functools
-from flask_login import current_user, LoginManager
+from flask_login import current_user, LoginManager, fresh_login_required
 from flaskapp.database import Credential
 
 login_manager = LoginManager()
@@ -17,7 +17,7 @@ def admin_required(func):
 
 @login_manager.user_loader
 def load_user(user_id):
-    user = Credential.query.get(user_id)
-    if user is not None:
-        user._authenticated = True
-    return user
+    credential = Credential.query.get(user_id)
+    if credential is not None:
+        credential._authenticated = True
+    return credential

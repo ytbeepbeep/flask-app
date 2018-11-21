@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, flash, make_response
 from flask_login import current_user, login_user, logout_user, login_required
+from flask_login import LoginManager, fresh_login_required, confirm_login
 from flaskapp.database import db, Credential
 from flaskapp.forms import LoginForm
 from flaskapp.views.home import index
@@ -30,7 +31,10 @@ def login():
 
 
 @auth.route("/logout")
-@login_required  # throws 401 HTTPException if user is anonymous
 def logout():
-    logout_user()
-    return redirect('/')
+    if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated is True:
+        logout_user()
+        return redirect('/')
+    else:
+        return make_response(index(), 401)
+
