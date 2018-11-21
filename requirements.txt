@@ -1,3 +1,7 @@
 flask
-wtforms
-werkzeug
+flask-login
+redis
+flask-wtf
+flask-sqlalchemy
+pip-tools
+stravalib==0.9
