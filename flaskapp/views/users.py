@@ -45,9 +45,8 @@ def create_user():
 
 
 @users.route('/delete_user', methods=['GET', 'POST'])
+@login_required
 def delete_user():
-    if not hasattr(current_user, 'is_authenticated') or current_user.is_authenticated is False:
-        return make_response(index(), 401)
 
     form = DeleteForm()
 
