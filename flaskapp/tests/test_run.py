@@ -1,11 +1,11 @@
 import requests
 import requests_testing
 
-from flaskapp.database import db, User, Run
-from flaskapp.tests.utility import client, create_user, new_run, login
+from flaskapp.database import db
+from flaskapp.tests.utility import client, create_user, login
 from flaskapp.tests.id_parser import get_element_by_id
 
-from flaskapp.clients import DataService
+from flaskapp.services import DataService
 
 def test_run(client):
     tested_app, app = client
@@ -20,7 +20,7 @@ def test_run(client):
         "average_heartrate": "1",
         "total_elevation_gain": "1"
     }
-    url = DataService.url + "/run/1"
+    url = "http://0.0.0.0:5001/run/1"
     requests_testing.add(request={'url': url}, response=run1)
 
     # prepare the database creating a new user
@@ -33,12 +33,9 @@ def test_run(client):
 
     # retrieve the user object from db
     with app.app_context():
-        q = db.session.query(User).filter(User.email == 'marco@prova.it')
-        user = q.first()
-
         # retrieve run page
-        run = tested_app.get('/run/1')  # should be one, because the database is empty
-        assert reply.status_code == 200
+        run = tested_app.get('http://0.0.0.0:5001/run/1')  # should be one, because the database is empty
+        assert run.status_code == 200
 
         # check the correctness of the fields
         assert get_element_by_id('start_date', str(reply.data)) == str(run.start_date)

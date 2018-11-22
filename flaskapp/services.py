@@ -1,5 +1,5 @@
 import requests
-from utils import SingletonDecorator
+from flaskapp.utils import SingletonDecorator
 
 URL = "http://localhost:5002"
 
