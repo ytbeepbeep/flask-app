@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response, url_for, abort
 from flask_login import login_required, current_user, logout_user
-from flaskapp.database import db, Credential
+from flaskapp.database import db, User, Credential
 from flaskapp.auth import admin_required
 from flaskapp.forms import UserForm, DeleteForm
 from flaskapp.views.home import index
@@ -12,9 +12,8 @@ users = Blueprint('users', __name__)
 @users.route('/users')
 @admin_required  # throws 401 HTTPException
 def _users():
-    users = db.session.query(Credential)
+    users = db.session.query(User)
     return render_template("users.html", users=users)
-
 
 @users.route('/create_user', methods=['GET', 'POST'])
 def create_user():

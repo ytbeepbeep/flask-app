@@ -5,7 +5,7 @@ from random import uniform, randint
 from datetime import datetime
 
 from flaskapp.app import create_app
-from flaskapp.database import db, Credential
+from flaskapp.database import db, Run, User, Objective, Report
 
 
 # read in SQL for populating test data
@@ -32,10 +32,10 @@ def client():
     #with app.app_context():
         #db.engine.execute(_data_sql)
     with app.app_context():
-        q = db.session.query(Credential).filter(Credential.email == 'example@example.com')
-        credential = q.first()
-        if credential is None:
-            example = Credential()
+        q = db.session.query(User).filter(User.email == 'example@example.com')
+        user = q.first()
+        if user is None:
+            example = User()
             example.email = 'example@example.com'
             example.is_admin = True
             example.set_password('admin')
@@ -70,10 +70,107 @@ def create_user(client, email='marco@prova.it', firstname='marco', lastname='mar
                                                  vo2max=vo2max), follow_redirects=True)
 
 
-def new_user():
-    credential = Credential()
-    credential.email = 'test@example.com'
-    credential.set_password('test')
-    db.session.add(credential)
+def new_user(strava_token=None):
+    user = User()
+    user.email = 'test@example.com'
+    user.firstname = "A"
+    user.lastname = "Tester"
+    user.strava_token = 0
+    user.age = 0
+    user.weight = 0
+    user.max_hr = 0
+    user.rest_hr = 0
+    user.vo2max = 0
+    user.set_password('test')
+    if strava_token is not None:
+        user.strava_token = strava_token
+    db.session.add(user)
     db.session.commit()
-    return credential
+    return user
+
+
+def new_report(user, timestamp, choice_time):
+    rep = Report()
+    rep.runner_id = user.id
+    rep.timestamp = timestamp
+    rep.choice_time = choice_time
+    db.session.add(rep)
+    db.session.commit()
+    return
+
+
+def new_run(user, strava_id=randint(100, 100000000), name=None, distance=uniform(50.0, 10000.0), elapsed_time=uniform(30.0, 3600.0),
+            average_heartrate=None, total_elevation_gain=uniform(0.0, 25.0), start_date=datetime.now()):
+    if name is None :
+        name = "Run %s" % strava_id
+
+    run = Run()
+    run.runner = user
+    run.strava_id = strava_id  # a random number 100 - 1.000.000, we hope is unique
+    run.name = name
+    run.distance = distance  # 50m - 10 km
+    run.elapsed_time = elapsed_time  # 30s - 1h
+    run.average_speed = run.distance / run.elapsed_time
+    run.average_heartrate = average_heartrate
+    run.total_elevation_gain = total_elevation_gain  # 0m - 25m
+    run.start_date = start_date
+    db.session.add(run)
+    db.session.commit()
+
+
+def new_predefined_run(user):
+    run = Run()
+    run.runner = user
+    run.strava_id = 10  # a random number 100 - 1.000.000, we hope is unique
+    run.name = "Run " + str(run.strava_id)
+    run.distance = 50000.0  # 50m - 10 km
+    run.elapsed_time = 3900.0  # 30s - 1h
+    run.average_speed = run.distance / run.elapsed_time
+    run.average_heartrate = None
+    run.total_elevation_gain = 3.0 # 0m - 25m
+    run.start_date = datetime.now()
+    db.session.add(run)
+    db.session.commit()
+    return run
+
+def new_predefined_run_equal(user):
+    run = Run()
+    run.runner = user
+    run.strava_id = 10  # a random number 100 - 1.000.000, we hope is unique
+    run.name = "Run " + str(run.strava_id)
+    run.distance = 50000.0  # 50m - 10 km
+    run.elapsed_time = 4000.0  # 30s - 1h
+    run.average_speed = run.distance / run.elapsed_time
+    run.average_heartrate = None
+    run.total_elevation_gain = 3.0  # 0m - 25m
+    run.start_date = datetime.now()
+    db.session.add(run)
+    db.session.commit()
+    return run
+
+def new_predefined_run_test(user):
+    run = Run()
+    run.runner = user
+    run.strava_id = 10  # a random number 100 - 1.000.000, we hope is unique
+    run.name = "Run " + str(run.strava_id)
+    run.distance = 20000.0  # 50m - 10 km
+    run.elapsed_time = 200.0  # 30s - 1h
+    run.average_speed = run.distance / run.elapsed_time
+    run.average_heartrate = None
+    run.total_elevation_gain = 3.0  # 0m - 25m
+    run.start_date = datetime.now()
+    db.session.add(run)
+    db.session.commit()
+    return run
+
+def new_objective(user, name = "Test Objective", target_distance = "42", start_date = datetime.now(), end_date = datetime.now()):
+    objective = Objective()
+    objective.runner = user
+    objective.name = name
+    objective.target_distance = target_distance
+    objective.start_date = start_date
+    objective.end_date = end_date
+    db.session.add(objective)
+    db.session.commit()
+
+    return objective

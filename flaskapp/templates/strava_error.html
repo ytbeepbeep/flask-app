@@ -9,7 +9,7 @@
   <link rel="shortcut icon" href="#" />
 </head>
 <body>
-  {% if current_user.is_authenticated %}
+   {% if current_user.is_authenticated %}
     <div class="container-fluid">
         <ul class="nav nav-pills nav-stacked" role="tablist">
           <h2>Beep Beep</h2>
@@ -21,24 +21,17 @@
           <li><a href="/statistics">Statistics</a></li>
           <li><a href="/settingreport">Setting Report</a></li>
           {% if current_user.is_admin %}
-          <li class="active"><a href="/users"><span class="glyphicon glyphicon-user"></span>Users list</a></li>
+          <li><a href="/users"><span class="glyphicon glyphicon-user"></span>Users list</a></li>
           {% endif %}
           <li><a href="/delete_user"><span class="glyphicon glyphicon-user"></span>Delete User</a></li>
           <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
         </ul>
     </div>
     <div class="container">
-      {% if current_user.is_admin %}
-        <h1 class="titlepage">User List</h1>
-        <table>
-          <tr><td class="key">Firstname</td><td class="key">Lastname</td></tr>
-          {% for user in users: %}
-          <tr><td class="value">{{user.firstname}}</td><td class="value">{{user.lastname}}</td></tr>
-          {% endfor %}
-        </table>
-        <br>
-      {% endif %}
-    </div>
-  {% endif %}
+		<a class="btn btn-lg btn-primary btn-block" href='https://www.strava.com/logout' target="_blank">Logout from Strava</a><br>
+        <a class="btn btn-lg btn-primary btn-block" href={{auth_url}}>Authorize Strava Access</a><br>
+	</div>
+
+   {% endif %}
 </body>
 </html>

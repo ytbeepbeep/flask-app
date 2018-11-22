@@ -1,5 +1,5 @@
-from flaskapp.tests.utility import client, login, create_user, logout
-from flaskapp.database import db, Credential
+from flaskapp.tests.utility import client, login, create_user, logout, new_objective, new_predefined_run, new_report
+from flaskapp.database import db, User, Run, Report, Objective
 from werkzeug.security import check_password_hash
 
 
@@ -26,18 +26,17 @@ def test_create_user(client):
     assert create_user(tested_app).status_code == 403
 
     with app.app_context():
-        user = db.session.query(Credential).filter(Credential.email == 'andrea@prova.it').first()
+        user = db.session.query(User).filter(User.email == 'andrea@prova.it').first()
         assert user is not None
         assert user.email == 'andrea@prova.it'
-        # Implement after relavent API is added
-        # assert user.firstname == 'andrea'
-        # assert user.lastname == 'bongiorno'
+        assert user.firstname == 'andrea'
+        assert user.lastname == 'bongiorno'
         assert check_password_hash(user.password, '123456') is True
-        # assert user.age == 23
-        # assert user.weight == 70
-        # assert user.max_hr == 120
-        # assert user.rest_hr == 60
-        # assert user.vo2max == 99
+        assert user.age == 23
+        assert user.weight == 70
+        assert user.max_hr == 120
+        assert user.rest_hr == 60
+        assert user.vo2max == 99
 
     logout(tested_app)
 
@@ -71,15 +70,14 @@ def test_delete_user(client):
     reply = login(tested_app, email='marco@prova.it', password='123456')
     assert reply.status_code == 200
 
-    # TODO add after relavant parts are implemented
-    # with app.app_context():
-    #      user = db.session.query(User).filter(User.email == 'marco@prova.it').first()
-    #     new_predefined_run(user)
-    #     assert db.session.query(Run).filter(Run.runner_id == user.id).first() is not None
-    #     new_objective(user)
-    #     assert db.session.query(Objective).filter(Objective.runner_id == user.id).first() is not None
-    #     new_report(user, 1, 1)  # the 2nd and 3rd params doesn't matter
-    #     assert db.session.query(Report).filter(Report.runner_id == user.id).first() is not None
+    with app.app_context():
+        user = db.session.query(User).filter(User.email == 'marco@prova.it').first()
+        new_predefined_run(user)
+        assert db.session.query(Run).filter(Run.runner_id == user.id).first() is not None
+        new_objective(user)
+        assert db.session.query(Objective).filter(Objective.runner_id == user.id).first() is not None
+        new_report(user, 1, 1)  # the 2nd and 3rd params doesn't matter
+        assert db.session.query(Report).filter(Report.runner_id == user.id).first() is not None
 
     # retrieve delete_user page
     reply = tested_app.get('/delete_user')
@@ -97,12 +95,11 @@ def test_delete_user(client):
     reply = tested_app.post('/delete_user', data=dict(password='123456'), follow_redirects=True)
     assert reply.status_code == 200
 
-    # TODO add after relavant parts are implemented
     with app.app_context():
-        # assert db.session.query(Run).filter(Run.runner_id == user.id).first() is None
-        assert db.session.query(Credential).filter(Credential.email == 'marco@prova.it').first() is None
-        # assert db.session.query(Objective).filter(Objective.runner_id == user.id).first() is None
-        # assert db.session.query(Report).filter(Report.runner_id == user.id).first() is None
+        assert db.session.query(Run).filter(Run.runner_id == user.id).first() is None
+        assert db.session.query(User).filter(User.email == 'marco@prova.it').first() is None
+        assert db.session.query(Objective).filter(Objective.runner_id == user.id).first() is None
+        assert db.session.query(Report).filter(Report.runner_id == user.id).first() is None
 
 
 def test_users_list(client):
