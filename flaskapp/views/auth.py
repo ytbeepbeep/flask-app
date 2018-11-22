@@ -4,7 +4,6 @@ from flask_login import LoginManager, fresh_login_required, confirm_login
 from flaskapp.database import db, Credential
 from flaskapp.forms import LoginForm
 from flaskapp.views.home import index
-from werkzeug.security import check_password_hash
 
 auth = Blueprint('auth', __name__)
 
@@ -20,7 +19,9 @@ def login():
         email, password = form.data['email'], form.data['password']
 
         credential = db.session.query(Credential).filter(Credential.email == email).first()
-        if credential is not None and check_password_hash(credential.password, password):
+
+        print(credential)
+        if credential is not None and credential.authenticate(password):
             login_user(credential)
             # TODO: get to data-service for retrieve User data and fill User table
             return redirect('/')

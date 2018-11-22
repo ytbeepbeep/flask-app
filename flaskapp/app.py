@@ -26,7 +26,7 @@ def create_app():
         q = db.session.query(Credential).filter(Credential.email == 'example@example.com')
         user_credential = q.first()
         if user_credential is None:
-            example = User()
+            example = Credential()
             example.email = 'example@example.com'
             example.is_admin = True
             example.set_password('admin')
