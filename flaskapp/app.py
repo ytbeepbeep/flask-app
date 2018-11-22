@@ -16,7 +16,7 @@ def create_app():
         app.register_blueprint(blueprint)
         blueprint.app = app
 
-    from flaskapp.database import db, Credential
+    from flaskapp.database import db, Credential, User
     db.init_app(app)
     db.create_all(app=app)
     login_manager.init_app(app)
@@ -26,7 +26,7 @@ def create_app():
         q = db.session.query(Credential).filter(Credential.email == 'example@example.com')
         user_credential = q.first()
         if user_credential is None:
-            example = User()
+            example = Credential()
             example.email = 'example@example.com'
             example.is_admin = True
             example.set_password('admin')

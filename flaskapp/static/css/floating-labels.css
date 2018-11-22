@@ -1,0 +1,230 @@
+/*General setting*/
+:root {
+  --input-padding-x: .75rem;
+  --input-padding-y: .75rem;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #9abfe2;
+}
+
+
+/*Setting form of the application*/
+.form-app {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  margin: auto;
+  background-color: #ffffff;
+}
+
+.container{
+  float: left;
+  margin-left: 90px;
+  background-color: #ffffff;
+  overflow:scroll
+
+}
+
+.container1{
+      float: left;
+      background-color: #ffffff;
+      width: 600px;
+      margin-right: 90px;
+      margin-left: auto;
+}
+
+/*Setting for message of error and success*/
+.error, .help-block, .success{
+  text-align: center;
+  color: red;
+}
+
+/*Setting list run index, list options statistics*/
+.listrun, .listchoice{
+    border: 1px solid #555;
+    padding: 8px;
+    background-color: #337ab7;
+    width: 100%;
+    font-size:14px;
+
+}
+
+.list{
+    color: #ffffff;
+}
+
+
+/*Setting style of navbar*/
+ul {
+    border: 1px solid #555;
+    padding: 0;
+    background-color: #191d5c;
+    height: 100%; /* Full height */
+    width: 150%;
+}
+
+li {
+    text-align: center;
+    border-bottom: 1px solid #555;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+/*setting Table for property of selected run*/
+table  {
+	margin-left:auto;
+	margin-right:auto;
+}
+
+td, th {
+	border:1px solid #000000;
+	padding:8px;
+	background: #9abfe2;
+}
+
+.key{
+    color: #000000;
+    text-align: center;
+    font-weight: bold;
+}
+
+.value{
+    color: #000000;
+    text-align: center;
+}
+
+.measure{
+    margin: 0;
+}
+
+/*Setting style for radio selection in setting report*/
+ul#setting_mail{
+    list-style-type: none;
+    text-color: #ffffff;
+    background: #337ab7;
+    text-align: center;
+    width:100%
+}
+
+label[for=setting_mail-0],label[for=setting_mail-1] ,label[for=setting_mail-2]{
+    color: #ffffff;
+}
+
+
+
+/*General setting of the main page*/
+
+.titlepage{
+  text-align: center;
+}
+
+dt{
+  text-align: center;
+}
+
+h3,a,p {
+  text-align: center;
+}
+
+h2{
+  text-align: center;
+  color: #ffffff;
+  margin-bottom: 30px;
+  padding: 20px;
+}
+
+
+/*Setting for form-label*/
+.form-label-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.form-label-group > input,
+.form-label-group > label {
+  padding: var(--input-padding-y) var(--input-padding-x);
+}
+
+
+.form-label-group > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  margin-bottom: 0; /* Override default `<label>` margin */
+  line-height: 1.5;
+  color: #495057;
+  cursor: text; /* Match the input under the label */
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  transition: all .1s ease-in-out;
+}
+
+.form-label-group input::-webkit-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input:-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-moz-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::placeholder {
+  color: transparent;
+}
+
+.form-label-group input:not(:placeholder-shown) {
+  padding-top: calc(var(--input-padding-y) + var(--input-padding-y) * (2 / 3));
+  padding-bottom: calc(var(--input-padding-y) / 3);
+}
+
+.form-label-group input:not(:placeholder-shown) ~ label {
+  padding-top: calc(var(--input-padding-y) / 3);
+  padding-bottom: calc(var(--input-padding-y) / 3);
+  font-size: 12px;
+  color: #777;
+}
+
+/* Fallback for Edge
+-------------------------------------------------- */
+@supports (-ms-ime-align: auto) {
+  .form-label-group > label {
+    display: none;
+  }
+  .form-label-group input::-ms-input-placeholder {
+    color: #777;
+  }
+}
+
+/* Fallback for IE
+-------------------------------------------------- */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .form-label-group > label {
+    display: none;
+  }
+  .form-label-group input:-ms-input-placeholder {
+    color: #777;
+  }
+}
