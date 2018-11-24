@@ -11,6 +11,7 @@ FUNCTIONS = {
 
 METHODS = ["GET", "POST", "DELETE"]
 
+
 @SingletonDecorator
 class DataService:
 

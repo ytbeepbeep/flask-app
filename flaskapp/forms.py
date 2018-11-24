@@ -28,3 +28,20 @@ class UserForm(FlaskForm):
 class DeleteForm(FlaskForm):
     password = f.PasswordField('Password', validators=[DataRequired("Insert a valid password")])
     display = ['password']
+
+
+class ObjectiveForm(FlaskForm):
+    name = f.StringField('Name', validators=[DataRequired("Insert the objective name")])
+    start_date = f.DateField('Start date', format='%Y-%m-%d', validators=[DataRequired("Insert when to start the objective")])
+    end_date = f.DateField('End Date', format='%Y-%m-%d', validators=[DataRequired("Insert when to end the objective")])
+    target_distance = f.FloatField('Target Distance', validators=[DataRequired("Insert the target distance")])
+    display = ['name', 'start_date', 'end_date', 'target_distance']
+
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        result = True
+         # Check start_date < end_date
+        if self.start_date.data > self.end_date.data:
+            result = False
+        return result
