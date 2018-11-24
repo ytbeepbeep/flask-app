@@ -21,7 +21,7 @@ def create_app():
     db.create_all(app=app)
     login_manager.init_app(app)
 
-        # create a first admin user
+    # create a first admin user
     with app.app_context():
         q = db.session.query(Credential).filter(Credential.email == 'example@example.com')
         user_credential = q.first()

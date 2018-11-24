@@ -31,7 +31,7 @@ def create_user():
             c = db.session.query(Credential).filter(new_credential.email == Credential.email)
             if c.first() is None:
                 # TODO Call API
-                new_credential.set_password(form.password.data)  # pw should be hashed with some salt
+                new_credential.set_password(form.password.data)
                 db.session.add(new_credential)
                 db.session.commit()
                 return redirect(url_for('auth.login'))
@@ -69,8 +69,8 @@ def delete_user():
 
                 db.session.delete(current_user)
                 db.session.commit()
-                
-                logout_user()  # This will also clean up the remember me cookie if it exists.
+
+                logout_user()  # This will also clean up the remember me cookie
                 return redirect('/')
             else:
                 flash("Incorrect password", category='error')

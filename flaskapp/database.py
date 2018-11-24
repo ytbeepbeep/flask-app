@@ -27,7 +27,6 @@ class Credential(db.Model):
 
     def authenticate(self, password):
         print(password, " ", self.password)
-        #checked = self.password == password
         checked = check_password_hash(self.password, password)
         self._authenticated = checked
         return self._authenticated

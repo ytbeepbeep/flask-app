@@ -1,16 +1,10 @@
 import pytest
 import os
 import tempfile
-from random import uniform, randint
-from datetime import datetime
 
 from flaskapp.app import create_app
 from flaskapp.database import db, Credential
 
-
-# read in SQL for populating test data
-# with open(os.path.join(os.path.dirname(__file__), 'prova.sql'), 'rb') as f:
-#    _data_sql = f.read().decode('utf8')
 
 @pytest.fixture
 def client():
@@ -29,8 +23,6 @@ def client():
 
     db.create_all(app=app)
     db.init_app(app=app)
-    #with app.app_context():
-        #db.engine.execute(_data_sql)
     with app.app_context():
         q = db.session.query(Credential).filter(Credential.email == 'example@example.com')
         credential = q.first()
