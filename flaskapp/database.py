@@ -33,3 +33,27 @@ class Credential(db.Model):
 
     def get_id(self):
         return self.id
+
+
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.Unicode(128), nullable=False)
+    firstname = db.Column(db.Unicode(128))
+    lastname = db.Column(db.Unicode(128))
+    strava_token = db.Column(db.String(128))
+    age = db.Column(db.Integer)
+    weight = db.Column(db.Numeric(4, 1))
+    max_hr = db.Column(db.Integer)
+    rest_hr = db.Column(db.Integer)
+    vo2max = db.Column(db.Numeric(4, 2))
+
+    def to_json(self):
+        res = {}
+        for attr in ('id', 'email', 'firstname', 'lastname', 'age', 'weight',
+                     'max_hr', 'rest_hr', 'vo2max'):
+            value = getattr(self, attr)
+            if isinstance(value, db.Numeric):
+                value = float(value)
+            res[attr] = value
+        return res

@@ -1,7 +1,6 @@
 import pytest
 import os
 import tempfile
-
 from flaskapp.app import create_app
 from flaskapp.database import db, Credential
 
@@ -15,10 +14,10 @@ def client():
     app = create_app()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db_fd, app.config['DATABASE'] = tempfile.mkstemp()
-    print(app.config['DATABASE'])
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+app.config['DATABASE']
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False  # disable CSRF validation -> DO THIS ONLY DURING TESTS!
+
     client = app.test_client()
 
     db.create_all(app=app)

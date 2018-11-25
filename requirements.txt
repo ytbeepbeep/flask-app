@@ -4,6 +4,7 @@ redis
 flask-wtf
 flask-sqlalchemy
 pip-tools
-stravalib==0.9
+stravalib
 wtforms
 werkzeug
+requests_mock

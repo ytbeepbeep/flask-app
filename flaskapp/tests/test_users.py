@@ -1,6 +1,10 @@
 from flaskapp.tests.utility import client, login, create_user, logout
 from flaskapp.database import db, Credential
 from werkzeug.security import check_password_hash
+import requests_mock
+import os
+
+DATASERVICE = os.environ['DATA_SERVICE']
 
 
 def test_create_user(client):
@@ -10,13 +14,15 @@ def test_create_user(client):
 
     assert tested_app.post('/create_user', data=None).status_code == 400
 
-    reply = tested_app.post('/create_user', data=dict(email='andrea@prova.it', firstname='andrea', lastname='bongiorno',
-                                                      password='123456',
-                                                      age=23,
-                                                      weight=70,
-                                                      max_hr=120,
-                                                      rest_hr=60,
-                                                      vo2max=99), follow_redirects=True)
+    with requests_mock.mock() as m:
+        m.post(DATASERVICE + '/users')
+        reply = tested_app.post('/create_user', data=dict(email='andrea@prova.it', firstname='andrea', lastname='bongiorno',
+                                                          password='123456',
+                                                          age=23,
+                                                          weight=70,
+                                                          max_hr=120,
+                                                          rest_hr=60,
+                                                          vo2max=99), follow_redirects=True)
 
     assert reply.status_code == 200  # create_user success (it also redirect to login)
 
@@ -29,27 +35,21 @@ def test_create_user(client):
         user = db.session.query(Credential).filter(Credential.email == 'andrea@prova.it').first()
         assert user is not None
         assert user.email == 'andrea@prova.it'
-        # Implement after relavent API is added
-        # assert user.firstname == 'andrea'
-        # assert user.lastname == 'bongiorno'
         assert check_password_hash(user.password, '123456') is True
-        # assert user.age == 23
-        # assert user.weight == 70
-        # assert user.max_hr == 120
-        # assert user.rest_hr == 60
-        # assert user.vo2max == 99
 
     logout(tested_app)
 
     # cannot create a user with the same email
-    reply = tested_app.post('/create_user', data=dict(email='andrea@prova.it', firstname='andrea', lastname='bongiorno',
-                                                      password='123456',
-                                                      age=23,
-                                                      weight=70,
-                                                      max_hr=120,
-                                                      rest_hr=60,
-                                                      vo2max=99), follow_redirects=False)
-    assert reply.status_code == 409
+    with requests_mock.mock() as m:
+        m.post(DATASERVICE + '/users', status_code=409)
+        reply = tested_app.post('/create_user', data=dict(email='andrea@prova.it', firstname='andrea', lastname='bongiorno',
+                                                          password='123456',
+                                                          age=23,
+                                                          weight=70,
+                                                          max_hr=120,
+                                                          rest_hr=60,
+                                                          vo2max=99), follow_redirects=False)
+        assert reply.status_code == 409
 
 
 def test_delete_user(client):

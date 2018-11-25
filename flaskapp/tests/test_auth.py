@@ -1,11 +1,17 @@
 from flaskapp.tests.utility import client, create_user, login, logout
+import requests_mock
+import os
+
+DATASERVICE = os.environ['DATA_SERVICE']
 
 
 def test_login(client):
     tested_app, app = client
 
     # creates 'marco@prova.it' with psw '123456'
-    assert create_user(tested_app).status_code == 200
+    with requests_mock.mock() as m:
+        m.post(DATASERVICE + '/users')
+        assert create_user(tested_app).status_code == 200
 
     # in the db exists 'marco@prova.it' and 'example@example.com' (the admin)
     # try to login with incorrect mail
@@ -36,7 +42,9 @@ def test_logout(client):
     assert logout(tested_app).status_code == 401
 
     # creates 'marco@prova.it' with psw '123456'
-    assert create_user(tested_app).status_code == 200
+    with requests_mock.mock() as m:
+        m.post(DATASERVICE + '/users')
+        assert create_user(tested_app).status_code == 200
 
     # in the db exists 'marco@prova.it' and 'example@example.com' (the admin)
 

@@ -1,12 +1,13 @@
 from flask import Blueprint, redirect, render_template, request, flash, make_response, url_for, abort
 from flask_login import login_required, current_user, logout_user
-from flaskapp.database import db, Credential
+from flaskapp.database import db, Credential, User
 from flaskapp.auth import admin_required
 from flaskapp.forms import UserForm, DeleteForm
-from flaskapp.views.home import index
-
+import requests
+import os
 
 users = Blueprint('users', __name__)
+DATASERVICE = os.environ['DATA_SERVICE']
 
 
 @users.route('/users')
@@ -23,18 +24,20 @@ def create_user():
         return abort(403)
 
     form = UserForm()
-    if request.method == 'POST':
 
+    if request.method == 'POST':
         if form.validate_on_submit():
-            new_credential = Credential()
-            form.populate_obj(new_credential)
-            c = db.session.query(Credential).filter(new_credential.email == Credential.email)
-            if c.first() is None:
-                # TODO Call API
+            new_user = User()
+            form.populate_obj(new_user)
+            c = db.session.query(Credential).filter(new_user.email == Credential.email)
+            reply = requests.post(DATASERVICE + '/users', data=new_user.to_json())
+            if c.first() is None and reply.status_code == 200:
+                new_credential = Credential()
+                new_credential.email = new_user.email
                 new_credential.set_password(form.password.data)
                 db.session.add(new_credential)
                 db.session.commit()
-                return redirect(url_for('auth.login'))
+                return redirect('/')
             else:
                 flash('Already existing user', category='error')
                 return make_response(render_template('create_user.html', form=form), 409)

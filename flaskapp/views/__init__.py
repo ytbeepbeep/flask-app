@@ -5,3 +5,4 @@ from flaskapp.views.run import run
 from flaskapp.views.objectives import objectives
 
 blueprints = [home, auth, users, objectives, run]
+
