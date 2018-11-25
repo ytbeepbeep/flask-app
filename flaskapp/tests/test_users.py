@@ -55,7 +55,9 @@ def test_create_user(client):
 def test_delete_user(client):
     tested_app, app = client
 
-    reply = create_user(tested_app)  # creates a user with 'marco@prova.it' as email, default
+    with requests_mock.mock() as m:
+        m.post(DATASERVICE + '/users')
+        reply = create_user(tested_app)  # creates a user with 'marco@prova.it' as email, default
     assert reply.status_code == 200
 
     reply = login(tested_app, 'marco@prova.it', '123456')
@@ -116,7 +118,9 @@ def test_users_list(client):
     reply = logout(tested_app)
     assert reply.status_code == 200
 
-    assert create_user(tested_app).status_code == 200
+    with requests_mock.mock() as m:
+        m.post(DATASERVICE + '/users')
+        assert create_user(tested_app).status_code == 200
 
     assert login(tested_app, email='marco@prova.it', password='123456').status_code == 200
 

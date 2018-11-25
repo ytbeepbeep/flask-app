@@ -1,11 +1,14 @@
 import requests
 import requests_testing
-
+import requests_mock
+import os
 from flaskapp.database import db
 from flaskapp.tests.utility import client, create_user, login
 from flaskapp.tests.id_parser import get_element_by_id
 
 from flaskapp.services import DataService
+
+DATASERVICE = os.environ['DATA_SERVICE']
 
 def test_run(client):
     tested_app, app = client
@@ -24,14 +27,16 @@ def test_run(client):
     requests_testing.add(request={'url': url}, response=run1)
 
     # prepare the database creating a new user
-    reply = create_user(tested_app)  # creates a user with 'marco@prova.it' as email, default
+    with requests_mock.mock() as m:
+        m.post(DATASERVICE + '/users')
+        reply = create_user(tested_app)  # creates a user with 'marco@prova.it' as email, default
     assert reply.status_code == 200
 
     # login as new user
     reply = login(tested_app, email='marco@prova.it', password='123456')
     assert reply.status_code == 200
 
-    # retrieve the user object from db
+    """# retrieve the user object from db
     with app.app_context():
         # retrieve run page
         run = tested_app.get('http://0.0.0.0:5001/run/1')  # should be one, because the database is empty
@@ -48,4 +53,4 @@ def test_run(client):
         # retrieving not existing run
         reply = tested_app.get('/run/45678')
         assert reply.status_code == 404
-
+    """
