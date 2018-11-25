@@ -8,6 +8,7 @@ env:
     - MODULE_NAME=flaskapp
     - IMAGE_NAME=ytbeepbeep/flask-app
     - VERSION=0.2
+    - DATA_SERVICE=127.0.0.1:5001
 
 language: python
 python: 3.6
