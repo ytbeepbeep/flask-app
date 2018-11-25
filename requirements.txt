@@ -8,3 +8,4 @@ stravalib
 wtforms
 werkzeug
 requests_mock
+requests_testing
