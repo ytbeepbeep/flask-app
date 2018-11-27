@@ -10,6 +10,7 @@ class Credential(db.Model):
     email = db.Column(db.Unicode(128), nullable=False)
     password = db.Column(db.Unicode(128), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
+    authorized_strava = db.Column(db.Boolean)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
 

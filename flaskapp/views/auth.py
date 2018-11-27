@@ -1,10 +1,38 @@
-from flask import Blueprint, render_template, redirect, flash, make_response
+from flask import Blueprint, render_template, redirect, flash, make_response, request
 from flask_login import current_user, login_user, logout_user, login_required
 from flaskapp.database import db, Credential
 from flaskapp.forms import LoginForm
 from flaskapp.views.home import index
+from stravalib import Client
+from flaskapp.auth import strava_auth_url
+import os
+import requests
 
 auth = Blueprint('auth', __name__)
+
+DATASERVICE = os.environ['DATA_SERVICE']
+
+
+@auth.route('/strava_auth')
+@login_required
+def _strava_auth():  # pragma: no cover
+    code = request.args.get('code')
+    client = Client()
+    xc = client.exchange_code_for_token
+    access_token = xc(client_id=os.environ['STRAVA_CLIENT_ID'],
+                      client_secret=os.environ['STRAVA_CLIENT_SECRET'],
+                      code=code)
+    user_id = db.session.query(Credential).filter(current_user.id == Credential.id).first().user_id
+    reply = requests.post(DATASERVICE + '/users/'+str(user_id), json={'strava_token': access_token})
+
+    if reply.status_code == 409:
+        return make_response(render_template('strava_error.html', auth_url=strava_auth_url()), 409)
+
+    current_user.authorized_strava = True
+    db.session.merge(current_user)
+    db.session.commit()
+
+    return redirect('/')
 
 
 @auth.route('/login', methods=['GET', 'POST'])
