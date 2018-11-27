@@ -16,7 +16,7 @@ def _strava_auth_url():
     return url
 
 
-def strava_auth_url(config):
+def strava_auth_url():
     return _strava_auth_url()
 
 

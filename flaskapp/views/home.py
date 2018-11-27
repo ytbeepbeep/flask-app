@@ -24,5 +24,5 @@ def index():
             print("ERROR: ", ex)
             # TODO: Add an error message
 
-    return render_template("index.html", current_user=current_user, strava_auth_url=strava_auth_url(home.app.config),
+    return render_template("index.html", current_user=current_user, strava_auth_url=strava_auth_url(),
                            total_average_speed=total_average_speed)
