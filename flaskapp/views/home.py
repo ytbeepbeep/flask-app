@@ -1,22 +1,10 @@
 from flask import Blueprint, render_template
 from flask_login import current_user
 from flaskapp.services import DataService
+from flaskapp.auth import strava_auth_url
 from stravalib import Client
 
 home = Blueprint('home', __name__)
-
-
-def _strava_auth_url(config):
-    client = Client()
-    client_id = config['STRAVA_CLIENT_ID']
-    redirect = 'http://127.0.0.1:5000/strava_auth'
-    url = client.authorization_url(client_id=client_id,
-                                   redirect_uri=redirect)
-    return url
-
-
-def strava_auth_url(config):
-    return _strava_auth_url(config)
 
 
 @home.route('/')
@@ -36,4 +24,5 @@ def index():
             print("ERROR: ", ex)
             # TODO: Add an error message
 
-    return render_template("index.html", current_user=current_user, strava_auth_url=strava_auth_url(home.app.config), total_average_speed=total_average_speed)
+    return render_template("index.html", current_user=current_user, strava_auth_url=strava_auth_url(home.app.config),
+                           total_average_speed=total_average_speed)
