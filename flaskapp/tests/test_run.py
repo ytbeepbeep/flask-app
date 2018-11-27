@@ -10,6 +10,7 @@ from flaskapp.services import DataService
 
 DATASERVICE = os.environ['DATA_SERVICE']
 
+
 def test_run(client):
     tested_app, app = client
 

@@ -73,16 +73,6 @@ def test_delete_user(client):
     reply = login(tested_app, email='marco@prova.it', password='123456')
     assert reply.status_code == 200
 
-    # TODO add after relavant parts are implemented
-    # with app.app_context():
-    #      user = db.session.query(User).filter(User.email == 'marco@prova.it').first()
-    #     new_predefined_run(user)
-    #     assert db.session.query(Run).filter(Run.runner_id == user.id).first() is not None
-    #     new_objective(user)
-    #     assert db.session.query(Objective).filter(Objective.runner_id == user.id).first() is not None
-    #     new_report(user, 1, 1)  # the 2nd and 3rd params doesn't matter
-    #     assert db.session.query(Report).filter(Report.runner_id == user.id).first() is not None
-
     # retrieve delete_user page
     reply = tested_app.get('/delete_user')
     assert reply.status_code == 200
@@ -101,10 +91,7 @@ def test_delete_user(client):
 
     # TODO add after relavant parts are implemented
     with app.app_context():
-        # assert db.session.query(Run).filter(Run.runner_id == user.id).first() is None
         assert db.session.query(Credential).filter(Credential.email == 'marco@prova.it').first() is None
-        # assert db.session.query(Objective).filter(Objective.runner_id == user.id).first() is None
-        # assert db.session.query(Report).filter(Report.runner_id == user.id).first() is None
 
 
 def test_users_list(client):

@@ -1,7 +1,8 @@
 import requests
+import os
 from flaskapp.utils import SingletonDecorator
 
-URL = "http://localhost:5002"
+URL = os.environ['DATA_SERVICE']
 
 FUNCTIONS = {
     "GET": requests.get,
@@ -16,7 +17,7 @@ class DataService:
 
     @staticmethod
     def do_method(method, url, **kwds):
-        if(method not in METHODS):
+        if method not in METHODS:
             raise "method not allowed"
 
         params = {}

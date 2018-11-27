@@ -31,9 +31,5 @@ def login():
 @auth.route("/logout")
 @login_required
 def logout():
-    if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated is True:
-        logout_user()
-        return redirect('/')
-    else:
-        return make_response(index(), 401)
-
+    logout_user()
+    return redirect('/')

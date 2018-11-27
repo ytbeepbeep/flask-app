@@ -15,8 +15,10 @@ def _strava_auth_url(config):
                                    redirect_uri=redirect)
     return url
 
+
 def strava_auth_url(config):
     return _strava_auth_url(config)
+
 
 @home.route('/')
 def index():
@@ -34,4 +36,4 @@ def index():
             print("ERROR: ", ex)
             # TODO: Add an error message
 
-    return render_template("index.html", current_user=user, strava_auth_url=strava_auth_url(home.app.config), total_average_speed=total_average_speed)
+    return render_template("index.html", current_user=current_user, strava_auth_url=strava_auth_url(home.app.config), total_average_speed=total_average_speed)
