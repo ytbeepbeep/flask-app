@@ -23,7 +23,8 @@ def _strava_auth():  # pragma: no cover
                       client_secret=os.environ['STRAVA_CLIENT_SECRET'],
                       code=code)
     user_id = db.session.query(Credential).filter(current_user.id == Credential.id).first().user_id
-    reply = requests.post(DATASERVICE + '/users/'+str(user_id), json={'strava_token': access_token})
+
+    reply = requests.post(DATASERVICE + '/user/'+str(user_id), json={'strava_token': access_token['access_token']})
 
     if reply.status_code == 409:
         return make_response(render_template('strava_error.html', auth_url=strava_auth_url()), 409)
