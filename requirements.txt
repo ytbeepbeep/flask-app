@@ -7,5 +7,6 @@ pip-tools
 stravalib
 wtforms
 werkzeug
+requests
 requests_mock
 requests_testing

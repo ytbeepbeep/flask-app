@@ -10,7 +10,7 @@ def test_login(client):
 
     # creates 'marco@prova.it' with psw '123456'
     with requests_mock.mock() as m:
-        m.post(DATASERVICE + '/users')
+        m.post(DATASERVICE + '/users', json={'user': 1})
         assert create_user(tested_app).status_code == 200
 
     # in the db exists 'marco@prova.it' and 'example@example.com' (the admin)
@@ -43,7 +43,7 @@ def test_logout(client):
 
     # creates 'marco@prova.it' with psw '123456'
     with requests_mock.mock() as m:
-        m.post(DATASERVICE + '/users')
+        m.post(DATASERVICE + '/users', json={'user': 1})
         assert create_user(tested_app).status_code == 200
 
     # in the db exists 'marco@prova.it' and 'example@example.com' (the admin)

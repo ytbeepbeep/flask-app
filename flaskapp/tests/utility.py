@@ -30,6 +30,7 @@ def client():
             example.email = 'example@example.com'
             example.is_admin = True
             example.set_password('admin')
+            example.user_id = -1
             db.session.add(example)
             db.session.commit()
 

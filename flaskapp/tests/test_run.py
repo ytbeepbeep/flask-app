@@ -29,7 +29,7 @@ def test_run(client):
 
     # prepare the database creating a new user
     with requests_mock.mock() as m:
-        m.post(DATASERVICE + '/users')
+        m.post(DATASERVICE + '/users', json={'user': 1})
         reply = create_user(tested_app)  # creates a user with 'marco@prova.it' as email, default
     assert reply.status_code == 200
 

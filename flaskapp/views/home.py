@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template
-from flask_login import current_user, login_user, logout_user, login_required
+from flask_login import current_user
 from flaskapp.services import DataService
 from stravalib import Client
 
-import requests
-
 home = Blueprint('home', __name__)
+
 
 def _strava_auth_url(config):
     client = Client()
@@ -26,6 +25,7 @@ def index():
     total_average_speed = None
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
         try:
+            # TODO
             print("Try to get user data", current_user)
             reply = DataService.get("/user/%s"%current_user.id, params={})
 
