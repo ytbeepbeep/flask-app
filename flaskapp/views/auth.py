@@ -19,7 +19,6 @@ def login():
 
         credential = db.session.query(Credential).filter(Credential.email == email).first()
 
-        print(credential)
         if credential is not None and credential.authenticate(password):
             login_user(credential)
             return redirect('/')

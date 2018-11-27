@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Yellow Beep Beep</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/floating-labels.css') }}">
+    <link rel="shortcut icon" href="#" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="container-fluid">
+        <ul class="nav nav-pills nav-stacked" role="tablist">
+            <h2>Beep Beep</h2>
+            <li><a href="/">Home</a></li>
+            <li><a href="/create_objective">Create Objective</a></li>
+            <li><a href="/objectives">List Objectives</a></li>
+            <li><a href="/create_challenge">Create Challenge</a></li>
+            <li><a href="/challenge">Challenges</a></li>
+            <li class="active"><a href="/statistics">Statistics</a></li>
+            <li><a href="/settingreport">Setting Report</a></li>
+            {% if current_user.is_admin %}
+            <li><a href="/users"><span class="glyphicon glyphicon-user"></span>Users list</a></li>
+            {% endif %}
+            <li><a href="/delete_user"><span class="glyphicon glyphicon-user"></span>Delete User</a></li>
+            <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>Logout</a></li>
+        </ul>
+    </div>
+    <div class="container">
+        <h1 class="titlepage">Chose runs to compare</h1>
+        <h3>List of runs</h3>
+        {% for run in runs %}
+        <p class="listchoice"><input class="runs" type="checkbox" name="run" value={{run.id}}><span id={{run.id}} class="list">{{run.name}}</span><br></p>
+        {% endfor %}
+
+        <h3>Chose parameters to compare</h3>
+        <p class="listchoice"><input class="parameter" type="checkbox" name="run" value="1"><span class="list">Average Speed</span></p>
+        <p class="listchoice"><input class="parameter" type="checkbox" name="run" value="2"><span class="list">Distance</span></p>
+        <p class="listchoice"><input class="parameter" type="checkbox" name="run" value="3"><span class="list">Time</span></p><br>
+        <br>
+        <button id="stats" class="btn btn-lg btn-primary btn-block" type="button" onclick="myFunction()"> Statistics </button><br>
+    </div>
+    <div class="container1" id="BigContainer">
+        <h3 class="titlepage">Visualization of the graphs</h3>
+        <br>
+        <div class="text-center" id="containerGraph"></div>
+        <br>
+        <button class="btn btn-lg btn-primary btn-block" type="button" id="gobackbutton"> Go back </button>
+        <br>
+    </div>
+    {% endif %}
+</body>
+
+</html>
+
+<script>
+    document.getElementById("gobackbutton").style.visibility = "hidden";
+    var dataToDraw = {}
+    var lparams = [false, false, false] // parameters for which the user wants statistics
+    function myFunction() {
+        //get selected items
+        var checkedValue = null;
+        var inputElements = document.getElementsByClassName('runs');
+        var inputElementsParameters = document.getElementsByClassName('parameter');
+        var dictToSend = {}
+        var j = 0;
+        var lruns = [] // ids of selected runs
+        for (var i = 0; i < inputElements.length; i++) {
+            if (inputElements[i].checked) {
+                lruns[j] = inputElements[i].value;
+                j++;
+            }
+        }
+        for (i = 0; i < 3; i++) {
+            if (inputElementsParameters[i].checked) {
+                lparams[i] = true;
+            }
+        }
+        dictToSend["runs"] = lruns;
+        dictToSend["params"] = lparams;
+        console.log(dictToSend);
+        //get data from server
+        var xmlhttp = new XMLHttpRequest();
+        const url = 'run/statistics'
+        xmlhttp.onreadystatechange = function() { //function called once we get data from server
+            //send ok check 4?
+            if (xmlhttp.readyState === 4) {
+                console.log(xmlhttp.response);
+                dataToDraw = JSON.parse(xmlhttp.response);
+                google.charts.load('current', {
+                    packages: ['corechart', 'line']
+                });
+                google.charts.setOnLoadCallback(drawGraph);
+
+            }
+        }
+        xmlhttp.open("POST", url)
+        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlhttp.send(JSON.stringify(dictToSend))
+    }
+
+    function drawGraph() {
+        //delete all previous graph
+        console.log(dataToDraw)
+        if (lparams[0]) {
+            let data = new google.visualization.DataTable();
+            let options = {
+                hAxis: {
+                    title: 'Run'
+                },
+                vAxis: {
+                    title: 'Average Speed'
+                }
+            };
+            data.addColumn('number', 'n°');
+            data.addColumn('number', 'Speed');
+            pointsToPlot = []
+            let i = 0;
+            for (var id in dataToDraw) {
+                console.log(id);
+                pointsToPlot[i] = [parseInt(i), dataToDraw[id][0]]
+                i++;
+            }
+            data.addRows(pointsToPlot);
+            let chartdiv = document.createElement("div");
+            chartdiv.id = "chart_div";
+            document.getElementById("containerGraph").appendChild(chartdiv);
+            let chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+        if (lparams[1]) {
+            let data1 = new google.visualization.DataTable();
+            let options = {
+                hAxis: {
+                    title: 'Run'
+                },
+                vAxis: {
+                    title: 'Distance'
+                }
+            };
+            data1.addColumn('number', 'n°');
+            data1.addColumn('number', 'Distance');
+            pointsToPlot = []
+            let i = 0;
+            for (var id in dataToDraw) {
+                console.log(id);
+                pointsToPlot[i] = [parseInt(i), dataToDraw[id][1]]
+                i++;
+            }
+            data1.addRows(pointsToPlot);
+            let chartdiv = document.createElement("div");
+            chartdiv.id = "chart_div1";
+            document.getElementById("containerGraph").appendChild(chartdiv);
+            let chart = new google.visualization.LineChart(document.getElementById('chart_div1'));
+            chart.draw(data1, options);
+        }
+        if (lparams[2]) {
+            let data2 = new google.visualization.DataTable();
+            let options = {
+                hAxis: {
+                    title: 'Run'
+                },
+                vAxis: {
+                    title: 'Time'
+                }
+            };
+            data2.addColumn('number', 'n°');
+            data2.addColumn('number', 'Time');
+            pointsToPlot = []
+            let i = 0;
+            for (var id in dataToDraw) {
+                console.log(id);
+                pointsToPlot[i] = [parseInt(i), dataToDraw[id][2]]
+                i++;
+            }
+            data2.addRows(pointsToPlot);
+            let chartdiv = document.createElement("div");
+            chartdiv.id = "chart_div2";
+            document.getElementById("containerGraph").appendChild(chartdiv);
+            let chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
+            chart.draw(data2, options);
+        }
+        document.getElementById("gobackbutton").onclick = function() {
+            location.reload();
+        }
+        document.getElementById("gobackbutton").style.visibility = "visible";
+        document.getElementById("stats").style.visibility = "hidden";
+    }
+</script>

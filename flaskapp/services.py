@@ -12,7 +12,6 @@ FUNCTIONS = {
 METHODS = ["GET", "POST", "DELETE"]
 
 
-@SingletonDecorator
 class DataService:
 
     @staticmethod
@@ -31,14 +30,18 @@ class DataService:
         return FUNCTIONS[method](URL + url, params=params, data=data)
 
     @staticmethod
-    def get(url, params):
+    def get(url, params = {}):
+        print("Request to DS: GET %s"%url)
         return DataService.do_method("GET", url, params=params)
 
     @staticmethod
-    def post(url, data):
+    def post(url, data = {}):
+        print("Request to DS: POST %s"%url)
         return DataService.do_method("POST", url, data=data)
 
     @staticmethod
-    def delete(url, params):
+    def delete(url, params = {}):
+        print("params")
+        print(params)
         return DataService.do_method("DELETE", url, params=params)
 

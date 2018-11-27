@@ -34,6 +34,9 @@ class Credential(db.Model):
     def get_id(self):
         return self.id
 
+    def __str__(self):
+        return "%s - %s (authenticated? %s)"%(self.id, self.email, self.is_authenticated)
+
 
 class User(db.Model):
     __tablename__ = 'user'

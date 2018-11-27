@@ -3,11 +3,10 @@ from flask_login import login_required, current_user, logout_user
 from flaskapp.database import db, Credential, User
 from flaskapp.auth import admin_required
 from flaskapp.forms import UserForm, DeleteForm
+from flaskapp.services import DataService
 import requests
-import os
 
 users = Blueprint('users', __name__)
-DATASERVICE = os.environ['DATA_SERVICE']
 
 
 @users.route('/users')
@@ -20,6 +19,7 @@ def _users():
 @users.route('/create_user', methods=['GET', 'POST'])
 def create_user():
     # A connected user cannot create other users
+    print(current_user)
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated is True:
         return abort(403)
 
@@ -29,9 +29,15 @@ def create_user():
         if form.validate_on_submit():
             new_user = User()
             form.populate_obj(new_user)
+            
+            reply = DataService.post('/users', data=new_user.to_json())
+
+            if reply.status_code != 200:
+                flash('The server encountered an error', category='error')
+                return make_response(render_template('create_user.html', form=form), 500)
+
             c = db.session.query(Credential).filter(new_user.email == Credential.email)
-            reply = requests.post(DATASERVICE + '/users', data=new_user.to_json())
-            if c.first() is None and reply.status_code == 200:
+            if c.first() is None:
                 new_credential = Credential()
                 new_credential.email = new_user.email
                 new_credential.set_password(form.password.data)
