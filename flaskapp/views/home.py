@@ -15,7 +15,7 @@ def index():
         try:
             # TODO
             print("Try to get user data", current_user)
-            reply = DataService.get("/user/%s"%current_user.id, params={})
+            reply = DataService.get("/user/%s"%current_user.user_id, params={})
 
             # TODO: get the user
             
