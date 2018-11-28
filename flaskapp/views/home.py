@@ -13,6 +13,7 @@ home = Blueprint('home', __name__)
 @home.route('/')
 def index():
     user = None
+    runs = {}
     total_average_speed = None
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
         try:
