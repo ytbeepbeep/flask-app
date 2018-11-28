@@ -34,7 +34,6 @@ def create_user():
             new_user = User()
             form.populate_obj(new_user)
 
-            # reply = DataService.post('/users', json=new_user.to_json())
 
             reply = requests.post(DATASERVICE + '/users', json=new_user.to_json())
             c = db.session.query(Credential).filter(new_user.email == Credential.email)
