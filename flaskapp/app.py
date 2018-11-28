@@ -34,7 +34,7 @@ def create_app():
              example = Credential()
              example.email = 'example@example.com'
              example.is_admin = True
-             example.user_id = -1;
+             example.dataservice_user_id = -1
              example.set_password('admin')
              db.session.add(example)
              db.session.commit()

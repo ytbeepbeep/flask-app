@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    {% if current_user.is_authenticated %}
+    {% if user %}
     <div class="container-fluid">
         <ul class="nav nav-pills nav-stacked" role="tablist">
             <h2>Beep Beep</h2>
@@ -22,7 +22,7 @@
             <li><a href="/challenge">Challenges</a></li>
             <li><a href="/statistics">Statistics</a></li>
             <li><a href="/settingreport">Setting Report</a></li>
-            {% if current_user.is_admin %}
+            {% if user.is_admin %}
             <li><a href="/users"><span class="glyphicon glyphicon-user"></span>Users list</a></li>
             {% endif %}
             <li><a href="/delete_user"><span class="glyphicon glyphicon-user"></span>Delete User</a></li>
@@ -30,8 +30,8 @@
         </ul>
     </div>
     <div class="container">
-        <h1 class="titlepage">Hi {{ current_user.firstname }}</h1>
-        {% if not current_user.authorized_strava %}
+        <h1 class="titlepage">Hi {{ user.firstname }}</h1>
+        {% if not credential.authorized_strava %}
         <p><a class="btn btn-primary" href="{{strava_auth_url}}">Authorize Strava Access</a></p>
         {% else %}
         <h3>Your last 10 runs</h3><br>

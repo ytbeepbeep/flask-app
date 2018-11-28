@@ -2,11 +2,14 @@ from flask import Blueprint, render_template, redirect, flash, make_response, re
 from flask_login import current_user, login_user, logout_user, login_required
 from flaskapp.database import db, Credential
 from flaskapp.forms import LoginForm
-from flaskapp.views.home import index
+from flaskapp.views.home import index, home
 from stravalib import Client
 from flaskapp.auth import strava_auth_url
+from flaskapp.services import DataService
+
 import os
 import requests
+
 
 auth = Blueprint('auth', __name__)
 
@@ -22,9 +25,14 @@ def _strava_auth():  # pragma: no cover
     access_token = xc(client_id=os.environ['STRAVA_CLIENT_ID'],
                       client_secret=os.environ['STRAVA_CLIENT_SECRET'],
                       code=code)
-    user_id = db.session.query(Credential).filter(current_user.id == Credential.id).first().user_id
+    user_id = db.session.query(Credential).filter(current_user.id == Credential.id).first().dataservice_user_id
 
-    reply = requests.post(DATASERVICE + '/user/'+str(user_id), json={'strava_token': access_token['access_token']})
+    if user_id is None:
+        return make_response(render_template('strava_error.html', auth_url=strava_auth_url()), 409)
+
+    print('uise: ', access_token)
+
+    reply = DataService().post('/user/%s'%str(user_id), data={'strava_token': access_token})
 
     if reply.status_code == 409:
         return make_response(render_template('strava_error.html', auth_url=strava_auth_url()), 409)

@@ -3,7 +3,7 @@ from flask_login import login_required, current_user, logout_user
 from flaskapp.database import db, Credential, User
 from flaskapp.auth import admin_required
 from flaskapp.forms import UserForm, DeleteForm
-# from flaskapp.services import DataService
+from flaskapp.services import DataService
 
 import requests
 import os
@@ -34,20 +34,19 @@ def create_user():
             new_user = User()
             form.populate_obj(new_user)
 
-            # reply = DataService.post('/users', json=new_user.to_json())
+            reply = DataService().post('/users', data=new_user.to_json())
 
-            reply = requests.post(DATASERVICE + '/users', json=new_user.to_json())
-            c = db.session.query(Credential).filter(new_user.email == Credential.email)
-            if c.first() is None and reply.status_code == 200:
+            credential = db.session.query(Credential).filter(new_user.email == Credential.email).first()
+            if credential is None and reply.status_code == 200:
                 user_id = reply.json()
                 new_credential = Credential()
                 new_credential.email = new_user.email
-                new_credential.user_id = user_id['user']
+                new_credential.dataservice_user_id = user_id['user']
                 new_credential.set_password(form.password.data)
                 db.session.add(new_credential)
                 db.session.commit()
                 return redirect('/')
-            elif reply.status_code == 409 or c.first is not None:
+            elif reply.status_code == 409 or credential is not None:
                 flash('User already existing', category='error')
                 return make_response(render_template('create_user.html', form=form), 409)
             else:
