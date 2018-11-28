@@ -30,9 +30,12 @@ def _strava_auth():  # pragma: no cover
     if user_id is None:
         return make_response(render_template('strava_error.html', auth_url=strava_auth_url()), 409)
 
-    print('uise: ', access_token)
+    # print('uise: ', access_token)
 
-    reply = DataService().post('/user/%s'%str(user_id), data={'strava_token': access_token})
+    if 'access_token' in access_token: # compatibility with stravalib 10
+        access_token = access_token['access_token']
+
+    reply = DataService().post('/users/%s'%str(user_id), data={'strava_token': access_token})
 
     if reply.status_code == 409:
         return make_response(render_template('strava_error.html', auth_url=strava_auth_url()), 409)

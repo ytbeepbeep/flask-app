@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    {% if user %}
+    {% if current_user.is_authenticated %}
     <div class="container-fluid">
         <ul class="nav nav-pills nav-stacked" role="tablist">
             <h2>Beep Beep</h2>
