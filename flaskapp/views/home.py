@@ -4,6 +4,9 @@ from flaskapp.services import DataService
 from flaskapp.auth import strava_auth_url
 from stravalib import Client
 
+import requests
+import os
+
 home = Blueprint('home', __name__)
 
 
@@ -15,8 +18,8 @@ def index():
         try:
             # TODO
             print("Try to get user data", current_user)
-            reply = DataService.get("/user/%s"%current_user.id, params={})
-
+            #reply = DataService.get("/user/%s"%current_user.user_id, params={})
+            reply = requests.get(os.environ['DATA_SERVICE'] + '/user/'+str(current_user.user_id))
             # TODO: get the user
             
             total_average_speed = None # TODO: fix it

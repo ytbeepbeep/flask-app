@@ -1,5 +1,5 @@
 import functools
-from flask_login import current_user, LoginManager, fresh_login_required
+from flask_login import current_user, LoginManager
 from flaskapp.database import Credential
 from stravalib import Client
 import os
