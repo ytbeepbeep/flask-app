@@ -101,5 +101,4 @@ def page_challenge():
                 requests.post(url="%s/challenges" % CHAL_SERVICE_URL, json=new_challenge.to_json())
                 return redirect('/challenges') , status
         return render_template('create_challenge.html', runs=runs, form=form) , status
-    elif request.method == 'DELETE':
-            requests.delete(url="%s/challenges" % CHAL_SERVICE_URL, params={'user_id': current_user.dataservice_user_id})
+        
