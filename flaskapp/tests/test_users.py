@@ -1,11 +1,10 @@
-from flaskapp.tests.utility import client, login, create_user, logout
+from flaskapp.tests.utility import client, login, create_user, logout, new_user
 from flaskapp.database import db, Credential
 from werkzeug.security import check_password_hash
 import requests_mock
 import os
 
 DATASERVICE = os.environ['DATA_SERVICE']
-
 
 
 def test_create_user(client):
@@ -92,9 +91,18 @@ def test_delete_user(client):
         reply = tested_app.post('/delete_user', data=dict(password='123456'), follow_redirects=True)
     assert reply.status_code == 200
 
-    # TODO add after relavant parts are implemented
     with app.app_context():
         assert db.session.query(Credential).filter(Credential.email == 'marco@prova.it').first() is None
+
+    with app.app_context():
+        user1 = new_user()
+        user1.dataservice_user_id = 99999
+        db.session.add(user1)
+        assert login(tested_app, user1.email, 'test').status_code == 200
+        with requests_mock.mock() as m:
+            m.delete(DATASERVICE + '/users/99999', status_code=404)
+            reply = tested_app.post('/delete_user', data=dict(password='test'), follow_redirects=True)
+    assert reply.status_code == 404
 
 
 def test_users_list(client):

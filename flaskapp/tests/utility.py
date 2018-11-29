@@ -67,8 +67,6 @@ def new_user():
     credential = Credential()
     credential.email = 'test@example.com'
     credential.set_password('test')
-    db.session.add(credential)
-    db.session.commit()
     return credential
 
 

@@ -45,7 +45,7 @@ class Credential(db.Model):
 
 
 # DO NOT INSERT USER IN THIS TABLE! THIS SERVES ONLY TO SHORTEN CODE IN SOME SITUATION. E.G. LIKE USER CREATION
-class User(db.Model):
+class User(db.Model):  # pragma: no cover
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.Unicode(128), nullable=False)
@@ -69,7 +69,7 @@ class User(db.Model):
         return res
 
 # DO NOT INSERT USER IN THIS DB! THIS SERVES ONLY TO SHORTEN CODE IN SOME SITUATION. E.G. LIKE Objective CREATION
-class Objective(db.Model):
+class Objective(db.Model): # pragma: no cover
     __tablename__ = 'objective'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.Unicode(128))
@@ -93,7 +93,7 @@ class Objective(db.Model):
         return res
 
 
-class Challenge(db.Model):
+class Challenge(db.Model): # pragma: no cover
     __tablename__ = 'challenge'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     run_one = db.Column(db.Integer)
@@ -127,7 +127,8 @@ class Challenge(db.Model):
             res[attr] = value
         return res
 
-class Report(db.Model):
+
+class Report(db.Model):  # pragma: no cover
     __tablename__ = 'report'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     runner_id = db.Column(db.Integer)

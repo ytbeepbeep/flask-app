@@ -1,5 +1,4 @@
 import requests
-import requests_testing
 import requests_mock
 import os
 from flaskapp.database import db
@@ -32,6 +31,7 @@ run1 = {
     "average_heartrate": "1",
     "total_elevation_gain": "1"
 }
+
 
 def test_run(client):
     tested_app, app = client

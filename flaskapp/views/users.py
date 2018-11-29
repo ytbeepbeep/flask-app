@@ -61,9 +61,8 @@ def create_user():
 @users.route('/delete_user', methods=['GET', 'POST'])
 @login_required
 def delete_user():
-
     form = DeleteForm()
-
+    print(current_user.email)
     if request.method == 'POST':
         if form.validate_on_submit():
             if current_user.authenticate(form.password.data) and hasattr(current_user, 'dataservice_user_id'):
@@ -83,6 +82,7 @@ def delete_user():
                     return make_response(render_template('delete_user.html', form=form), reply.status_code)
             else:
                 flash("Incorrect password", category='error')
+
                 return make_response(render_template("delete_user.html", form=form), 401)
         else:
             abort(400)

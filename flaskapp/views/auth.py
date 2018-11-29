@@ -52,7 +52,6 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email, password = form.data['email'], form.data['password']
-
         credential = db.session.query(Credential).filter(Credential.email == email).first()
 
         if credential is not None and credential.authenticate(password):
