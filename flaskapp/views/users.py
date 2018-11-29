@@ -10,7 +10,7 @@ import os
 
 users = Blueprint('users', __name__)
 
-DATASERVICE = os.environ['OBJECTIVE_SERVICE']
+DATASERVICE = os.environ['DATA_SERVICE']
 
 
 @users.route('/users')
@@ -67,8 +67,8 @@ def delete_user():
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            if current_user.authenticate(form.password.data) and hasattr(current_user, 'id'):
-                reply = requests.delete(DATASERVICE + '/user/' + str(current_user.id-1))
+            if current_user.authenticate(form.password.data) and hasattr(current_user, 'dataservice_user_id'):
+                reply = requests.delete(DATASERVICE + '/users/' + str(current_user.dataservice_user_id))
                 if reply.status_code == 200:
                     db.session.delete(current_user)
                     db.session.commit()

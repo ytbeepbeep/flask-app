@@ -18,7 +18,7 @@ DATASERVICE = os.environ['OBJECTIVE_SERVICE']
 @objectives.route('/objectives', methods=['GET'])
 @login_required
 def _objectives():
-    reply = requests.get(DATASERVICE + '/objectives?user_id=' + str(current_user.id-1))
+    reply = requests.get(DATASERVICE + '/objectives?user_id=' + str(current_user.dataservice_user_id))
     if reply.status_code == 200:
         print("list of objectives:", reply.json())
         return render_template("objectives.html", objectives=reply.json())
@@ -37,7 +37,7 @@ def create_objective():
         if form.validate_on_submit():
             new_objective = Objective()
             form.populate_obj(new_objective)
-            new_objective.user_id = current_user.id-1
+            new_objective.user_id = current_user.dataservice_user_id
             json = new_objective.to_json()
 
             reply = requests.post(DATASERVICE + '/objectives', json=json)
