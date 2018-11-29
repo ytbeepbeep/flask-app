@@ -26,8 +26,8 @@ def challenge_details(id):
     else:
         run_one = requests.get(url="%s/runs/%s" % (CHAL_SERVICE_URL, challenge.run_one), params={'user_id': id})
         run_two = requests.get(url="%s/runs/%s" % (CHAL_SERVICE_URL, challenge.run_two), params={'user_id': id})
-        name_run_one = run_one.name
-        name_run_two = run_two.name
+        name_run_one = run_one.title
+        name_run_two = run_two.title
 
         if run_one is None or run_two is None:
             flash('The run/s does not exist', category='error')
@@ -90,8 +90,8 @@ def page_challenge():
                 return render_template('create_challenge.html', runs=runs, form=form), status
             else:        
                 new_challenge = Challenge()
-                name_option_1 = reply_run_1.name
-                name_option_2 = reply_run_2.name
+                name_option_1 = reply_run_1.title
+                name_option_2 = reply_run_2.title
                 form.populate_obj(new_challenge)
                 new_challenge.set_challenge_user(current_user.id)
                 new_challenge.set_challenge1_run(run_one_id)
