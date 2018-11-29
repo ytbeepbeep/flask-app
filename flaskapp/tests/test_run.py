@@ -1,7 +1,5 @@
-import requests
 import requests_mock
 import os
-from flaskapp.database import db
 from flaskapp.tests.utility import client, create_user, login
 from flaskapp.tests.id_parser import get_element_by_id
 
@@ -51,6 +49,10 @@ def test_run(client):
         assert reply.status_code == 200
 
         assert get_element_by_id("run_name", str(reply.data)) == ("Run: %s" % run1['name'])
+
+        m.get(DATASERVICE + '/runs/9', status_code=404)
+        reply = tested_app.get('/run/9')
+        assert reply.status_code == 404
 
 
 def test_run_not_found(client):
