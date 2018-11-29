@@ -3,7 +3,6 @@ from flask_login import login_required, current_user, logout_user
 from flaskapp.database import db, Credential, User
 from flaskapp.auth import admin_required
 from flaskapp.forms import UserForm, DeleteForm
-from flaskapp.services import DataService
 
 import requests
 import os
@@ -34,7 +33,7 @@ def create_user():
             new_user = User()
             form.populate_obj(new_user)
 
-            reply = DataService().post('/users', data=new_user.to_json())
+            reply = requests.post(DATASERVICE + '/users', json=new_user.to_json())
 
             credential = db.session.query(Credential).filter(new_user.email == Credential.email).first()
             if credential is None and reply.status_code == 200:
@@ -69,7 +68,7 @@ def delete_user():
         if form.validate_on_submit():
             if current_user.authenticate(form.password.data) and hasattr(current_user, 'dataservice_user_id'):
 
-                reply = DataService.delete(url="/users/%s" % current_user.dataservice_user_id, params={})
+                reply = requests.delete(DATASERVICE + "/users/%s" % current_user.dataservice_user_id)
 
                 if reply.status_code == 200:
                     db.session.delete(current_user)

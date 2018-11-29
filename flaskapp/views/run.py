@@ -1,17 +1,19 @@
 from flask import Blueprint, render_template, abort, request, jsonify
 from flask_login import login_required
 import requests
-from flaskapp.services import DataService
+import os
 
 from flaskapp.database import db
 
 run = Blueprint('run', __name__)
 
+DATASERVICE = os.environ['DATA_SERVICE']
+
 
 @run.route('/run/<id>', methods=['GET'])
 @login_required
 def get_run(id):
-    run = DataService().get("/runs", params={'run_id': id})
+    run = requests.get(DATASERVICE + "/runs", params={'run_id': id})
     
     if run is None:
         abort(404)

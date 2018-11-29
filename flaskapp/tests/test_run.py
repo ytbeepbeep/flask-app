@@ -6,8 +6,6 @@ from flaskapp.database import db
 from flaskapp.tests.utility import client, create_user, login
 from flaskapp.tests.id_parser import get_element_by_id
 
-from flaskapp.services import DataService
-
 DATASERVICE = os.environ['DATA_SERVICE']
 
 
