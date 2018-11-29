@@ -21,7 +21,6 @@ def get_statistics():
         reply = DataService().get("/runs", params={'user_id': current_user.dataservice_user_id})
 
         if reply.status_code is not 200:
-            status_code = reply.status_code
             raise "error"
 
         runs = reply.json()
