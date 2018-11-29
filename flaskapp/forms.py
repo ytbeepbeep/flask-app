@@ -47,6 +47,10 @@ class ObjectiveForm(FlaskForm):
         return result
 
 
+class MailForm(FlaskForm):
+    setting_mail = f.RadioField('setting', choices=[('6', '6 hours'), ('12', '12 hours'), ('24','24 hours')])
+    display = ['setting']
+    
 class ChallengeForm(FlaskForm):
     run_one = f.IntegerField('run_one', validators=[DataRequired()])
     run_two = f.IntegerField('run_two', validators=[DataRequired()])
