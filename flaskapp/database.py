@@ -91,3 +91,63 @@ class Objective(db.Model):
                 value = calendar.timegm(value.timetuple())
             res[attr] = value
         return res
+
+
+class Challenge(db.Model):
+    __tablename__ = 'challenge'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    run_one = db.Column(db.Integer)
+    name_run_one = db.Column(db.Unicode(128))
+    run_two = db.Column(db.Integer)
+    name_run_two = db.Column(db.Unicode(128))
+    id_user = db.Column(db.Integer)
+
+    def set_challenge_user(self,id_usr):
+        self.id_user = id_user
+
+    def set_challenge1_run(self,run_one):
+        self.run_one = run_one
+
+    def set_challenge2_run(self,run_two):
+        self.run_two = run_two
+
+    def set_challenge1_name(self,name_one):
+        self.name_run_one = name_one
+
+    def set_challenge2_name(self,name_two):
+        self.name_run_two = name_two
+
+    def to_json(self):
+        res = {}
+        for attr in ('id', 'run_one', 'name_run_one', 'run_two',
+                     'name_run_two', 'id_user'):
+            value = getattr(self, attr)
+            if isinstance(value, datetime):
+                value = value.timestamp()
+            res[attr] = value
+        return res
+
+class Report(db.Model):
+    __tablename__ = 'report'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    runner_id = db.Column(db.Integer)
+    timestamp = db.Column(db.Float)
+    frequency = db.Column(db.Float)
+
+    def set_user(self, id_usr):
+        self.runner_id = id_usr
+
+    # timestamp from previous report, in seconds                                                                                                                             
+    def set_timestamp(self):
+        self.timestamp = time()
+
+    # frequency preference stored in seconds                                                                                                                                 
+    def set_frequency(self, choice):
+        self.frequency = (float(choice)*3600.0)
+
+    def to_json(self):
+        res = {}
+        for attr in ('id', 'runner_id', 'timestamp', 'frequency'):
+            res[attr] = getattr(self, attr)
+        return res
+
