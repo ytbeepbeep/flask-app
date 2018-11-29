@@ -13,7 +13,7 @@ DATA_SERVICE_URL = os.environ['DATA_SERVICE']
 CHAL_SERVICE_URL = os.environ['CHALLENGE_SERVICE']
 
 
-@challenge.route('/challenge/<id>',methods=['GET'])
+@challenge.route('/challenges/<id>',methods=['GET'])
 @login_required
 def challenge_details(id):
     win_distance = ""
@@ -58,7 +58,7 @@ def challenge_details(id):
     return render_template('comparechallenge.html', run_one=run_one, run_two=run_two, name_run_one=name_run_one , name_run_two=name_run_two, win_avg_speed=win_avg_speed, win_distance=win_distance, win_time=win_time )
 
 
-@challenge.route('/challenges', methods=['GET', 'POST'])
+@challenge.route('/challenges', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def page_challenge():
     status=200
@@ -99,5 +99,7 @@ def page_challenge():
                 new_challenge.set_challenge2_run(run_two_id)
                 new_challenge.set_challenge2_name(name_option_2)
                 requests.post(url="%s/challenges" % CHAL_SERVICE_URL, json=new_challenge.to_json())
-                return redirect('/challenge') , status
+                return redirect('/challenges') , status
         return render_template('create_challenge.html', runs=runs, form=form) , status
+    elif request.method == 'DELETE':
+            requests.delete(url="%s/challenges" % CHAL_SERVICE_URL, params={'user_id': current_user.dataservice_user_id})
