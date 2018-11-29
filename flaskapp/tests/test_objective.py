@@ -55,14 +55,16 @@ def test_create_objective(client):
     ))
     assert reply.status_code == 400
 
-    # test for create_objective logged in with wrong data
-    reply = tested_app.post('/create_objective', data=dict(
-            start_date="2018-07-04",
-            end_date="2018-07-05",
-            target_distance=22,
-            name="Test OK"
-    ))
+    with requests_mock.mock() as m:
+        m.post(OBJECTIVESERVICE + '/objectives')
+        reply = tested_app.post('/create_objective', data=dict(
+                start_date="2018-07-04",
+                end_date="2018-07-05",
+                target_distance=22,
+                name="Test OK"
+        ))
     assert reply.status_code == 200
+
 
 def test_view_objectives(client):
     tested_app, app = client
@@ -79,10 +81,9 @@ def test_view_objectives(client):
         # add the objective
         obj = new_objective(name="Test1")
 
-
         with requests_mock.mock() as m:
-            m.get(OBJECTIVESERVICE + 'objectives?user_id=1', json=obj.to_json())
-            reply = requests.get(OBJECTIVESERVICE + 'objectives?user_id=1')
+            m.get(OBJECTIVESERVICE + '/objectives?user_id=1', json=obj.to_json())
+            reply = requests.get(OBJECTIVESERVICE + '/objectives?user_id=1')
             # assert tested_app.get('/objectives', follow_redirects=True).status_code == 200
 
 
