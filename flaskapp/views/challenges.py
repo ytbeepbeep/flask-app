@@ -19,43 +19,48 @@ def challenge_details(id):
     win_distance = ""
     win_time = ""
     win_avg_speed = ""
-    challenge = requests.get(url="%s/challenges/%s" % (CHAL_SERVICE_URL, id), params={'user_id': current_user.dataservice_user_id})
-    if challenge is None:
-        flash('The challenge does not exist', category='error')
-        return make_response(render_template('challenge.html'), 404)
+    challenge_reply = requests.get(url="%s/challenges/%s" % (CHAL_SERVICE_URL, id), params={'user_id': current_user.dataservice_user_id})
+
+    if challenge_reply.status_code is 404:
+        abort(404)
+    elif challenge_reply.status_code is not 200:
+        abort(500)
+
+    challenge = challenge_reply.json()
+
+    run_one_reply = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, challenge["run_one"]), params={'user_id': current_user.dataservice_user_id})
+    run_two_reply = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, challenge["run_two"]), params={'user_id': current_user.dataservice_user_id})
+
+    if run_one_reply.status_code is not 200:
+        abort(503)
+    if run_two_reply.status_code is not 200:
+        abort(500)
+
+    run_one = run_one_reply.json()
+    run_two = run_two_reply.json()
+
+    if run_one["distance"] == run_two["distance"]:
+        win_distance = "The runs are equal for the distance field"
+    elif run_one["distance"] > run_two["distance"]:
+        win_distance = "The first run win for the distance field"
     else:
-        run_one = requests.get(url="%s/runs/%s" % (CHAL_SERVICE_URL, challenge.run_one), params={'user_id': id})
-        run_two = requests.get(url="%s/runs/%s" % (CHAL_SERVICE_URL, challenge.run_two), params={'user_id': id})
-        name_run_one = run_one.title
-        name_run_two = run_two.title
+        win_distance = "The second run win for the distance field"
 
-        if run_one is None or run_two is None:
-            flash('The run/s does not exist', category='error')
-            return make_response(render_template('challenge.html'), 404)
-        else:
+    if run_one["elapsed_time"] == run_two["elapsed_time"]:
+        win_time = "The runs are equal for the time"
+    elif run_one["elapsed_time"] < run_two["elapsed_time"]:
+        win_time = "The first run win for the time"
+    else:
+        win_time = "The second run win for the time"
 
-            if run_one.distance == run_two.distance:
-                win_distance = "The runs are equal for the distance field"
-            elif run_one.distance > run_two.distance:
-                win_distance = "The first run win for the distance field"
-            else:
-                win_distance = "The second run win for the distance field"
+    if run_one["average_speed"] > run_two["average_speed"]:
+        win_avg_speed = "The runs are equal for the average speed"
+    elif run_one["average_speed"] > run_two["average_speed"]:
+        win_avg_speed = "The first run win for the average speed"
+    else:
+        win_avg_speed = "The second run win for the average speed"
 
-            if run_one.elapsed_time == run_two.elapsed_time:
-                win_time = "The runs are equal for the time"
-            elif run_one.elapsed_time < run_two.elapsed_time:
-                win_time = "The first run win for the time"
-            else:
-                win_time = "The second run win for the time"
-
-            if run_one.average_speed > run_two.average_speed:
-                win_avg_speed = "The runs are equal for the average speed"
-            elif run_one.average_speed > run_two.average_speed:
-                win_avg_speed = "The first run win for the average speed"
-            else:
-                win_avg_speed = "The second run win for the average speed"
-
-    return render_template('comparechallenge.html', run_one=run_one, run_two=run_two, name_run_one=name_run_one , name_run_two=name_run_two, win_avg_speed=win_avg_speed, win_distance=win_distance, win_time=win_time )
+    return render_template('comparechallenge.html', run_one=run_one, run_two=run_two, win_avg_speed=win_avg_speed, win_distance=win_distance, win_time=win_time)
 
 
 @challenges.route('/create_challenge', methods=['GET', 'POST', 'DELETE'])
@@ -67,7 +72,7 @@ def create_challenge():
     runs_reply = requests.get("%s/runs" % (DATA_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
 
     if runs_reply.status_code is not 200:
-        abort(500)
+        abort(504)
 
     runs = runs_reply.json()
     
@@ -112,17 +117,18 @@ def create_challenge():
 @login_required
 def page_challenge():
     status = 200
+    challenges = None
 
     reply = requests.get(url="%s/challenges" % (CHAL_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
-    
+
     if reply.status_code is 404:
         flash('You do not have any challenge', category='error')
         status = 404
     elif reply.status_code is not 200:
         flash('Server error', category='error')
         status = 500
-
-    challenges = reply.json()
+    else:
+        challenges = reply.json()
     
     return render_template("challenge.html", current_user=current_user, challenges=challenges), status
         
