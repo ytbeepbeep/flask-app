@@ -34,7 +34,7 @@
         <h1 class="titlepage">Chose runs to compare</h1>
         <h3>List of runs</h3>
         {% for run in runs %}
-        <p class="listchoice"><input class="runs" type="checkbox" name="run" value={{run.id}}><span id={{run.id}} class="list">{{run.name}}</span><br></p>
+        <p class="listchoice"><input class="runs" type="checkbox" name="run" value={{run.id}}><span id="run_{{run.id}}" class="list">{{run.title}}</span><br></p>
         {% endfor %}
 
         <h3>Chose parameters to compare</h3>
@@ -42,6 +42,9 @@
         <p class="listchoice"><input class="parameter" type="checkbox" name="run" value="2"><span class="list">Distance</span></p>
         <p class="listchoice"><input class="parameter" type="checkbox" name="run" value="3"><span class="list">Time</span></p><br>
         <br>
+        <p class="error">
+            {% for errmess in get_flashed_messages(False,['error']) %}
+            <br>{{ errmess }} {% endfor%}</p>
         <button id="stats" class="btn btn-lg btn-primary btn-block" type="button" onclick="myFunction()"> Statistics </button><br>
     </div>
     <div class="container1" id="BigContainer">
@@ -59,7 +62,7 @@
 
 <script>
     document.getElementById("gobackbutton").style.visibility = "hidden";
-    var dataToDraw = {}
+    var runsData = JSON.parse('{{stats|safe}}')
     var lparams = [false, false, false] // parameters for which the user wants statistics
     function myFunction() {
         //get selected items
@@ -82,25 +85,18 @@
         }
         dictToSend["runs"] = lruns;
         dictToSend["params"] = lparams;
-        console.log(dictToSend);
-        //get data from server
-        var xmlhttp = new XMLHttpRequest();
-        const url = 'run/statistics'
-        xmlhttp.onreadystatechange = function() { //function called once we get data from server
-            //send ok check 4?
-            if (xmlhttp.readyState === 4) {
-                console.log(xmlhttp.response);
-                dataToDraw = JSON.parse(xmlhttp.response);
-                google.charts.load('current', {
-                    packages: ['corechart', 'line']
-                });
-                google.charts.setOnLoadCallback(drawGraph);
 
+        dataToDraw = {};
+        for (runId in runsData) {
+            if (lruns.indexOf(runId) != -1) {
+                dataToDraw[runId] = runsData[runId];
             }
         }
-        xmlhttp.open("POST", url)
-        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xmlhttp.send(JSON.stringify(dictToSend))
+
+        google.charts.load('current', {
+            packages: ['corechart', 'line']
+        });
+        google.charts.setOnLoadCallback(drawGraph);
     }
 
     function drawGraph() {

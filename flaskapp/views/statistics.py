@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, json, flash, make_response
 from flask_login import login_required
 
 from flaskapp.database import db
@@ -14,12 +14,23 @@ statistics = Blueprint('statistics', __name__)
 def get_statistics():
     """Inside the template we retrieve data from run/statistics
     using javascript"""
+    status_code = 200
     runs = []
+    stats = dict()
     try:
-        runs = DataService.get("/runs", params={"user_id": current_user.id})
-    except Exception as ex:
-        print(ex)
-        # TODO: Add an error message
+        reply = DataService().get("/runs", params={'user_id': current_user.dataservice_user_id})
 
-    return render_template("statistics.html", runs=runs)
+        if reply.status_code is not 200:
+            raise "error"
+
+        runs = reply.json()
+
+        for run in runs:
+            stats[run['id']] = [run['average_speed'], run['distance'], run['elapsed_time']]
+
+    except Exception:
+        flash('Cannot get runs data', category='error')
+        status_code = 500
+
+    return make_response(render_template("statistics.html", runs=runs, stats=json.dumps(stats)), status_code)
 

@@ -1,129 +1,108 @@
-"""from flaskapp.database import db
-from flaskapp.tests.utility import client, create_user, new_predefined_run, login, new_run
+from flaskapp.tests.utility import client, create_user, login
 from flaskapp.tests.id_parser import get_element_by_id
-import json
 
-def test_runs_data(client):
+import os
+import requests_mock
+import requests
+
+DATASERVICE = os.environ['DATA_SERVICE']
+
+user_id = 1
+user = dict(
+    email='test@test.com', 
+    firstname='test',
+    lastname='user',
+    password='test',
+    age=42,
+    weight=42,
+    max_hr=42,
+    rest_hr=42,
+    vo2max=42)
+
+runs = [
+        {
+            "average_heartrate": None, 
+            "average_speed": 2, 
+            "description": None, 
+            "distance": 1, 
+            "elapsed_time": 78, 
+            "id": 1, 
+            "runner_id": 1, 
+            "start_date": 1541697617.0, 
+            "strava_id": 1953352080, 
+            "title": "Evening Run", 
+            "total_elevation_gain": 0.0
+        }, 
+        {
+            "average_heartrate": None, 
+            "average_speed": 2, 
+            "description": None, 
+            "distance": 2, 
+            "elapsed_time": 27, 
+            "id": 2, 
+            "runner_id": 1, 
+            "start_date": 1541428619.0, 
+            "strava_id": 1947486973, 
+            "title": "Test 2", 
+            "total_elevation_gain": 0.0
+            },             {
+            "average_heartrate": None, 
+            "average_speed": 2, 
+            "description": None, 
+            "distance": 3, 
+            "elapsed_time": 16, 
+            "id": 3, 
+            "runner_id": 1, 
+            "start_date": 1541427162.0, 
+            "strava_id": 1947454690, 
+            "title": "Test 1", 
+            "total_elevation_gain": 0.0
+        }
+    ]
+
+
+def test_statistics_unauthorized(client):
     tested_app, app = client
 
-    assert create_user(tested_app).status_code == 200
-
-    # trying to retrieve data without logging in
-    reply = tested_app.post('run/statistics', data=json.dumps({'runs': [1, 2, 3, 4, 5], 'params': [True, True, True]}),
-                            content_type='application/json')
-    assert reply.status_code == 401
-
-    assert login(tested_app, email='marco@prova.it', password='123456').status_code == 200
-
-    # creating some fake runs
-    with app.app_context():
-        q = db.session.query(User).filter(User.email == 'marco@prova.it')
-        user = q.first()
-        run1 = new_predefined_run(user)  # run with id 1
-        run2 = new_predefined_run(user)  # run with id 2
-        run3 = new_predefined_run(user)  # run with id 3
-        run4 = new_predefined_run(user)  # run with id 4
-        run5 = new_predefined_run(user)  # run with id 5
-
-    reply = tested_app.post('run/statistics', data=json.dumps({'runs': [1, 2, 3, 4, 5], 'params': [True, True, True]}),
-                            content_type='application/json')
-
-    assert reply.status_code == 200
-    body = json.loads(str(reply.data, 'utf8'))
-    assert body == {'1': [12.820512820512821, 50000.0, 3900.0, 'Run 10'],
-                    '2': [12.820512820512821, 50000.0, 3900.0, 'Run 10'],
-                    '3': [12.820512820512821, 50000.0, 3900.0, 'Run 10'],
-                    '4': [12.820512820512821, 50000.0, 3900.0, 'Run 10'],
-                    '5': [12.820512820512821, 50000.0, 3900.0, 'Run 10']}
+    # Try to get the page without login
+    response = tested_app.get('/statistics')
+    assert response.status_code == 401
 
 
 def test_statistics(client):
     tested_app, app = client
 
-    reply = create_user(tested_app)
-    assert reply.status_code == 200
+    with requests_mock.mock() as mock:
+        # Login the user first
+        mock.post(DATASERVICE + '/users', json={'user': user_id})
+        response = tested_app.post('/create_user', data=user, follow_redirects=True)
+        assert response.status_code == 200 # User successfully created
 
-    with app.app_context():
-        q = db.session.query(User).filter(User.email == 'marco@prova.it')
-        user = q.first()
-        run1 = new_predefined_run(user)  # run with id 1
-        run2 = new_predefined_run(user)  # run with id 2
-        run3 = new_predefined_run(user)  # run with id 3
-        run4 = new_predefined_run(user)  # run with id 4
-        run5 = new_predefined_run(user)  # run with id 5
+        assert login(tested_app, user['email'], user['password']).status_code == 200
 
-        reply = tested_app.get('/statistics')
-        assert reply.status_code == 401
+        # Mock user and runs
+        mock.get(DATASERVICE + '/users/%s' % user_id, json=user)
+        mock.get(DATASERVICE + '/runs', json=runs)
 
-        assert login(tested_app, email='marco@prova.it', password='123456').status_code == 200
+        response = tested_app.get('/statistics')
+        assert response.status_code == 200
 
-        reply = tested_app.get('/statistics')
-        assert reply.status_code == 200
-
-        # check the correctness of the fields
-        assert get_element_by_id(str(run1.id), str(reply.data)) == str(run1.name)
-        assert get_element_by_id(str(run2.id), str(reply.data)) == str(run2.name)
-        assert get_element_by_id(str(run3.id), str(reply.data)) == str(run3.name)
-        assert get_element_by_id(str(run4.id), str(reply.data)) == str(run4.name)
-        assert get_element_by_id(str(run5.id), str(reply.data)) == str(run5.name)
+        for run in runs:
+            assert get_element_by_id("run_%s" % run['id'], str(response.data)) == run['title']
 
 
-def test_average_speed(client):
+def test_statistics_error(client):
     tested_app, app = client
 
-    # prepare the database creating a new user
-    reply = create_user(tested_app)  # creates a user with 'marco@prova.it' as email, default
-    assert reply.status_code == 200
+    with requests_mock.mock() as mock:
+        mock.post(DATASERVICE + '/users', json={'user': user_id})
+        response = tested_app.post('/create_user', data=user, follow_redirects=True)
+        assert response.status_code == 200 # User successfully created
 
-    # login as new user
-    reply = login(tested_app, email='marco@prova.it', password='123456')
-    assert reply.status_code == 200
+        assert login(tested_app, user['email'], user['password']).status_code == 200
 
-    # retrieve the user object and login
-    with app.app_context():
-        q = db.session.query(User).filter(User.email == 'marco@prova.it')
-        user = q.first()
-        user.strava_token = "fake_token"
-        db.session.commit()
+        mock.get(DATASERVICE + "/runs", exc=requests.exceptions.ConnectTimeout)
 
-    # The average speed should be 0 if there are no runs
-    reply = tested_app.get('/')
-    assert reply.status_code == 200
-    assert get_element_by_id('total_average_speed', str(reply.data)) == str(0)
-
-    # add a run
-    with app.app_context():
-        new_run(user)
-
-    # retrieve the run
-    with app.app_context():
-        q = db.session.query(Run).filter(Run.id == 1)  # should be the first
-        run1 = q.first()
-
-    # with only a run the average speed should be the average speed of the run
-    reply = tested_app.get('/')
-    assert reply.status_code == 200
-    assert get_element_by_id('total_average_speed', str(reply.data)) == str(round(run1.average_speed, 2))
-
-    # add another run
-    with app.app_context():
-        new_run(user)
-
-    # retrieve the runs list
-    with app.app_context():
-        runs = db.session.query(Run).filter()  # should be all owned by our user
-
-    # with multiples runs the average speed should be the average of the average speed of each run
-    total_average_speed = 0
-    for run in runs:
-        total_average_speed += run.average_speed
-    total_average_speed /= runs.count()
-
-    reply = tested_app.get('/')
-    assert reply.status_code == 200
-    assert get_element_by_id('total_average_speed', str(reply.data)) == str(round(total_average_speed, 2))
-"""
-assert True is True
-
-
+        response = tested_app.get('/statistics')
+        assert response.status_code == 500
 

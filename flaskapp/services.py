@@ -28,7 +28,7 @@ class DataService:
         if 'data' in kwds:
             data = kwds['data']
         
-        return FUNCTIONS[method](URL + url, params=params, data=data)
+        return FUNCTIONS[method](URL + url, params=params, json=data)
 
     @staticmethod
     def get(url, params = {}):

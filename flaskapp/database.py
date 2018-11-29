@@ -13,7 +13,7 @@ class Credential(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.Unicode(128), nullable=False)
     password = db.Column(db.Unicode(128), nullable=False)
-    user_id = db.Column(db.Integer, nullable=False)
+    dataservice_user_id = db.Column(db.Integer, nullable=False)
     authorized_strava = db.Column(db.Boolean)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
@@ -41,7 +41,7 @@ class Credential(db.Model):
         return self.id
 
     def __str__(self):
-        return "%s - %s (authenticated? %s)"%(self.id, self.email, self.is_authenticated)
+        return "%s - %s - authorized_strava: %s (authenticated? %s)"%(self.id, self.email, self.authorized_strava, self.is_authenticated)
 
 
 # DO NOT INSERT USER IN THIS TABLE! THIS SERVES ONLY TO SHORTEN CODE IN SOME SITUATION. E.G. LIKE USER CREATION

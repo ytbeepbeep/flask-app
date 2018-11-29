@@ -5,7 +5,6 @@ from flaskapp.auth import login_manager
 from flaskapp.database import db, Credential
 
 
-
 def create_app():
     app = Flask(__name__)
 
@@ -28,16 +27,16 @@ def create_app():
 
     # create a first admin user
     with app.app_context():
-         q = db.session.query(Credential).filter(Credential.email == 'example@example.com')
-         user_credential = q.first()
-         if user_credential is None:
-             example = Credential()
-             example.email = 'example@example.com'
-             example.is_admin = True
-             example.user_id = -1;
-             example.set_password('admin')
-             db.session.add(example)
-             db.session.commit()
+        q = db.session.query(Credential).filter(Credential.email == 'example@example.com')
+        user_credential = q.first()
+        if user_credential is None:
+            example = Credential()
+            example.email = 'example@example.com'
+            example.is_admin = True
+            example.dataservice_user_id = -1
+            example.set_password('admin')
+            db.session.add(example)
+            db.session.commit()
     return app
 
 
