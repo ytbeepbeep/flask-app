@@ -4,10 +4,13 @@ from flask_login import login_required
 from flaskapp.database import db
 from flaskapp.auth import current_user
 
-from flaskapp.services import DataService
+import requests
+import os
+
 
 statistics = Blueprint('statistics', __name__)
 
+DATASERVICE = os.environ['DATA_SERVICE']
 
 @statistics.route('/statistics', methods=['GET'])
 @login_required
@@ -18,7 +21,7 @@ def get_statistics():
     runs = []
     stats = dict()
     try:
-        reply = DataService().get("/runs", params={'user_id': current_user.dataservice_user_id})
+        reply = requests.get(DATASERVICE + "/runs", params={'user_id': current_user.dataservice_user_id})
 
         if reply.status_code is not 200:
             raise "error"

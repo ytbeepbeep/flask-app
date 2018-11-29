@@ -6,52 +6,63 @@ from flaskapp.database import db
 from flaskapp.tests.utility import client, create_user, login
 from flaskapp.tests.id_parser import get_element_by_id
 
-from flaskapp.services import DataService
-
 DATASERVICE = os.environ['DATA_SERVICE']
 
+
+user_id = 1
+user = dict(
+    email='test@test.com', 
+    firstname='test',
+    lastname='user',
+    password='test',
+    age=42,
+    weight=42,
+    max_hr=42,
+    rest_hr=42,
+    vo2max=42)
+
+# Run with id 1
+run1 = {
+    "id": 1,
+    "name": "test_run",
+    "start_date": "2018-10-10",
+    "distance": "22",
+    "elapsed_time": "33",
+    "average_speed": "32",
+    "average_heartrate": "1",
+    "total_elevation_gain": "1"
+}
 
 def test_run(client):
     tested_app, app = client
 
-    # Run with id 1
-    run1 = {
-        "id": 1,
-        "start_date": "2018-10-10",
-        "distance": "22",
-        "elapsed_time": "33",
-        "average_speed": "32",
-        "average_heartrate": "1",
-        "total_elevation_gain": "1"
-    }
-    url = "http://0.0.0.0:5001/run/1"
-    requests_testing.add(request={'url': url}, response=run1)
-
     # prepare the database creating a new user
     with requests_mock.mock() as m:
         m.post(DATASERVICE + '/users', json={'user': 1})
+        m.get(DATASERVICE + '/runs/1', json=run1)
         reply = create_user(tested_app)  # creates a user with 'marco@prova.it' as email, default
-    assert reply.status_code == 200
+        assert reply.status_code == 200
 
-    # login as new user
-    reply = login(tested_app, email='marco@prova.it', password='123456')
-    assert reply.status_code == 200
+        # login as new user
+        reply = login(tested_app, email='marco@prova.it', password='123456')
+        assert reply.status_code == 200
 
-    """# retrieve the user object from db
-    with app.app_context():
-        # retrieve run page
-        run = tested_app.get('http://0.0.0.0:5001/run/1')  # should be one, because the database is empty
-        assert run.status_code == 200
+        reply = tested_app.get('/run/1')
+        assert reply.status_code == 200
 
-        # check the correctness of the fields
-        assert get_element_by_id('start_date', str(reply.data)) == str(run.start_date)
-        assert get_element_by_id('distance', str(reply.data)) == str(run.distance)
-        assert get_element_by_id('elapsed_time', str(reply.data)) == str(run.elapsed_time // 60)
-        assert get_element_by_id('average_speed', str(reply.data)) == str(run.average_speed)
-        assert get_element_by_id('average_heartrate', str(reply.data)) == str(run.average_heartrate)
-        assert get_element_by_id('total_elevation_gain', str(reply.data)) == str(run.total_elevation_gain)
+        assert get_element_by_id("run_name", str(reply.data)) == ("Run: %s" % run1['name'])
 
-        # retrieving not existing run
-        reply = tested_app.get('/run/45678')
-        assert reply.status_code == 404
-    """
+
+def test_run_not_found(client):
+    tested_app, app = client
+
+    with requests_mock.mock() as mock:
+        mock.post(DATASERVICE + '/users', json={'user': user_id})
+        response = tested_app.post('/create_user', data=user, follow_redirects=True)
+        assert response.status_code == 200 # User successfully created
+
+        assert login(tested_app, user['email'], user['password']).status_code == 200
+        
+        mock.get(DATASERVICE + "/runs/-1", status_code=404)
+        assert tested_app.get('runs/-1').status_code == 404
+
