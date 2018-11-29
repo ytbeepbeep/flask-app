@@ -2,7 +2,8 @@ import pytest
 import os
 import tempfile
 from flaskapp.app import create_app
-from flaskapp.database import db, Credential
+from flaskapp.database import db, Credential, Objective
+from datetime import datetime
 
 
 @pytest.fixture
@@ -69,3 +70,16 @@ def new_user():
     db.session.add(credential)
     db.session.commit()
     return credential
+
+
+def new_objective(name = "Test Objective", target_distance = "42", start_date = datetime.now(), end_date = datetime.now(), user_id = 1):
+    objective = Objective()
+    objective.name = name
+    objective.target_distance = target_distance
+    objective.start_date = start_date
+    objective.end_date = end_date
+    objective.user_id = user_id
+    db.session.add(objective)
+    db.session.commit()
+
+    return objective
