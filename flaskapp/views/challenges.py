@@ -7,7 +7,7 @@ from flaskapp.forms import ChallengeForm
 import requests
 import os
 
-challenge = Blueprint('challenge', __name__)
+challenge = Blueprint('challenges', __name__)
 
 DATA_SERVICE_URL = os.environ['DATA_SERVICE']
 CHAL_SERVICE_URL = os.environ['CHALLENGE_SERVICE']
@@ -63,6 +63,7 @@ def challenge_details(id):
 def page_challenge():
     status=200
     if request.method == 'GET':
+        print("SONO QUI")
         challenges = requests.get(url="%s/challenges" % (CHAL_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
         if challenges is None:
             flash('You do not have any challenge', category='error')
@@ -101,4 +102,3 @@ def page_challenge():
                 requests.post(url="%s/challenges" % CHAL_SERVICE_URL, json=new_challenge.to_json())
                 return redirect('/challenges') , status
         return render_template('create_challenge.html', runs=runs, form=form) , status
-        

@@ -17,10 +17,10 @@
           <li><a href="/create_objective">Create Objective</a></li>
           <li><a href="/objectives">List Objectives</a></li>
           <li><a href="/create_challenge">Create Challenge</a></li>
-          <li class="active"><a href="/challenge/<id>">Compare Challenge</a></li>
-          <li><a href="/challenge">Challenges</a></li>
+          <li class="active"><a href="/challenges/<id>">Compare Challenge</a></li>
+          <li><a href="/challenges">Challenges</a></li>
           <li><a href="/statistics">Statistics</a></li>
-          <li><a href="/settingreport">Setting Report</a></li>
+          <li><a href="/frequency">Setting Report</a></li>
           {% if current_user.is_admin %}
           <li><a href="/users"><span class="glyphicon glyphicon-user"></span>Users list</a></li>
           {% endif %}
@@ -36,7 +36,7 @@
             <tr><td class="key">Challenge first id name: </td><td class="value"><p id="challenge_{{challenge.id}}_name_run_one">{{ challenge.name_run_one }}</p></td></tr>
             <tr><td class="key">Challenge second id run: </td><td class="value"><p id="challenge_{{challenge.id}}_run_two">{{ challenge.run_two }}</p></td></tr>
             <tr><td class="key">Challenge second id name: </td><td class="value"><p id="challenge_{{challenge.id}}_name_run_two">{{ challenge.name_run_two }}</p></td></tr>
-            <tr><td class="key">Vai alla challenge: </td><td class="value"><a href="/challenge/{{ challenge.id }}">Vai</a></td></tr>
+            <tr><td class="key">Vai alla challenge: </td><td class="value"><a href="/challenges/{{ challenge.id }}">Vai</a></td></tr>
         </table><br>
         {% endfor %}
     </div>
