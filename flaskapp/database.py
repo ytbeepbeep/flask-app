@@ -1,5 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.orm import relationship
+from datetime import datetime, date
+import calendar
+
 
 db = SQLAlchemy()
 
@@ -61,5 +65,29 @@ class User(db.Model):
             value = getattr(self, attr)
             if isinstance(value, db.Numeric):
                 value = float(value)
+            res[attr] = value
+        return res
+
+# DO NOT INSERT USER IN THIS DB! THIS SERVES ONLY TO SHORTEN CODE IN SOME SITUATION. E.G. LIKE Objective CREATION
+class Objective(db.Model):
+    __tablename__ = 'objective'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.Unicode(128))
+    target_distance = db.Column(db.Float)
+    start_date = db.Column(db.DateTime)
+    end_date = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer)
+
+    @staticmethod
+    def to_datetime(date_str):
+        return datetime.fromtimestamp(float(date_str))
+
+    def to_json(self):
+        res = {}
+        for attr in ('id', 'name', 'target_distance', 'start_date',
+                     'end_date', 'user_id'):
+            value = getattr(self, attr)
+            if isinstance(value, date):
+                value = calendar.timegm(value.timetuple())
             res[attr] = value
         return res

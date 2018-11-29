@@ -24,7 +24,8 @@ def _strava_auth():  # pragma: no cover
                       code=code)
     user_id = db.session.query(Credential).filter(current_user.id == Credential.id).first().user_id
 
-    reply = requests.post(DATASERVICE + '/user/'+str(user_id), json={'strava_token': access_token['access_token']})
+    reply = requests.post(DATASERVICE + '/user/'+str(user_id), json={'strava_token': access_token})
+    # It doesnt work with access_token['access_token'] since accessToken has no member accessToken and is just a token in stravalib=0.9
 
     if reply.status_code == 409:
         return make_response(render_template('strava_error.html', auth_url=strava_auth_url()), 409)

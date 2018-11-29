@@ -10,7 +10,7 @@ import os
 
 users = Blueprint('users', __name__)
 
-DATASERVICE = os.environ['DATA_SERVICE']
+DATASERVICE = os.environ['OBJECTIVE_SERVICE']
 
 
 @users.route('/users')
@@ -69,25 +69,18 @@ def delete_user():
     if request.method == 'POST':
         if form.validate_on_submit():
             if current_user.authenticate(form.password.data) and hasattr(current_user, 'id'):
-                # TODO Call API
-                # runs = db.session.query(Run).filter(Run.runner_id == current_user.id)
-                # objectives = db.session.query(Objective).filter(Objective.runner_id == current_user.id)
-                # reports = db.session.query(Report).filter(Report.runner_id == current_user.id)
-
-                # for run in runs.all():
-                #     db.session.delete(run)
-
-                # for report in reports.all():
-                #     db.session.delete(report)
-
-                # for objective in objectives.all():
-                #     db.session.delete(objective)
-
-                db.session.delete(current_user)
-                db.session.commit()
-
-                logout_user()  # This will also clean up the remember me cookie
-                return redirect('/')
+                reply = requests.delete(DATASERVICE + '/user/' + str(current_user.id-1))
+                if reply.status_code == 200:
+                    db.session.delete(current_user)
+                    db.session.commit()
+                    logout_user()  # This will also clean up the remember me cookie
+                    return redirect('/')
+                elif reply.status_code == 404:
+                    flash('User does not exist on the data service', category='error')
+                    return make_response(render_template('delete_user.html', form=form), 404)
+                else:
+                    flash('The server encountered an error', category='error')
+                    return make_response(render_template('delete_user.html', form=form), reply.status_code)
             else:
                 flash("Incorrect password", category='error')
                 return make_response(render_template("delete_user.html", form=form), 401)
