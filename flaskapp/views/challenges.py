@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, make_response, flash
+from flask import Blueprint, render_template, request, make_response, flash, abort
 from flask_login import current_user, login_required
 from werkzeug.utils import redirect
 from flaskapp.database import Challenge
@@ -7,13 +7,13 @@ from flaskapp.forms import ChallengeForm
 import requests
 import os
 
-challenge = Blueprint('challenges', __name__)
+challenges = Blueprint('challenges', __name__)
 
 DATA_SERVICE_URL = os.environ['DATA_SERVICE']
 CHAL_SERVICE_URL = os.environ['CHALLENGE_SERVICE']
 
 
-@challenge.route('/challenges/<id>',methods=['GET'])
+@challenges.route('/challenges/<id>', methods=['GET'])
 @login_required
 def challenge_details(id):
     win_distance = ""
@@ -58,21 +58,21 @@ def challenge_details(id):
     return render_template('comparechallenge.html', run_one=run_one, run_two=run_two, name_run_one=name_run_one , name_run_two=name_run_two, win_avg_speed=win_avg_speed, win_distance=win_distance, win_time=win_time )
 
 
-@challenge.route('/challenges', methods=['GET', 'POST', 'DELETE'])
+@challenges.route('/create_challenge', methods=['GET', 'POST', 'DELETE'])
 @login_required
-def page_challenge():
-    status=200
-    if request.method == 'GET':
-        print("SONO QUI")
-        challenges = requests.get(url="%s/challenges" % (CHAL_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
-        if challenges is None:
-            flash('You do not have any challenge', category='error')
-        return render_template("challenge.html", challenges=challenges)
+def create_challenge():
+    status = 200
+    form = ChallengeForm()
     
-    elif request.method == 'POST':
-        form = ChallengeForm()
-        if form.validate_on_submit():
-            runs = requests.get(url="%s/runs" % (DATA_SERVICE_URL), params={'user_id': id})
+    runs_reply = requests.get("%s/runs" % (DATA_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
+
+    if runs_reply.status_code is not 200:
+        abort(500)
+
+    runs = runs_reply.json()
+    
+    if request.method == 'POST':
+        if form.validate_on_submit(): 
             
             run_one_id = request.form['run_one']
             run_two_id = request.form['run_two']
@@ -80,25 +80,49 @@ def page_challenge():
             reply_run_1 = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, run_one_id))
             reply_run_2 = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, run_two_id))
 
-            if reply_run_1.status_code is not 200 :
+            if reply_run_1.status_code is not 200:
                 flash('The run/s do not exist or are the same', category='error')
                 status = reply_run_1.status_code
                 return render_template('create_challenge.html', runs=runs, form=form), status
 
-            if reply_run_2.status_code is not 200 :
+            if reply_run_2.status_code is not 200:
                 flash('The run/s do not exist or are the same', category='error')
                 status = reply_run_2.status_code
                 return render_template('create_challenge.html', runs=runs, form=form), status
-            else:        
+            else:
+                run_1 = reply_run_1.json()
+                run_2 = reply_run_2.json()
+
                 new_challenge = Challenge()
-                name_option_1 = reply_run_1.title
-                name_option_2 = reply_run_2.title
+                name_option_1 = run_1["title"]
+                name_option_2 = run_2["title"]
                 form.populate_obj(new_challenge)
-                new_challenge.set_challenge_user(current_user.id)
+                new_challenge.set_challenge_user(current_user.dataservice_user_id)
                 new_challenge.set_challenge1_run(run_one_id)
                 new_challenge.set_challenge1_name(name_option_1)
                 new_challenge.set_challenge2_run(run_two_id)
                 new_challenge.set_challenge2_name(name_option_2)
                 requests.post(url="%s/challenges" % CHAL_SERVICE_URL, json=new_challenge.to_json())
                 return redirect('/challenges') , status
-        return render_template('create_challenge.html', runs=runs, form=form) , status
+
+    return render_template('create_challenge.html', runs=runs, form=form), status
+
+
+@challenges.route('/challenges', methods=['GET'])
+@login_required
+def page_challenge():
+    status = 200
+
+    reply = requests.get(url="%s/challenges" % (CHAL_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
+    
+    if reply.status_code is 404:
+        flash('You do not have any challenge', category='error')
+        status = 404
+    elif reply.status_code is not 200:
+        flash('Server error', category='error')
+        status = 500
+
+    challenges = reply.json()
+    
+    return render_template("challenge.html", current_user=current_user, challenges=challenges), status
+        

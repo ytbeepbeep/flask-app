@@ -45,3 +45,9 @@ class ObjectiveForm(FlaskForm):
         if self.start_date.data > self.end_date.data:
             result = False
         return result
+
+
+class ChallengeForm(FlaskForm):
+    run_one = f.IntegerField('run_one', validators=[DataRequired()])
+    run_two = f.IntegerField('run_two', validators=[DataRequired()])
+    display = ['run_one','run_two']

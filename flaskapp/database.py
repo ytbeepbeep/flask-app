@@ -102,7 +102,7 @@ class Challenge(db.Model):
     name_run_two = db.Column(db.Unicode(128))
     id_user = db.Column(db.Integer)
 
-    def set_challenge_user(self,id_usr):
+    def set_challenge_user(self,id_user):
         self.id_user = id_user
 
     def set_challenge1_run(self,run_one):
