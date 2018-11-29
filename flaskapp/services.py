@@ -27,7 +27,7 @@ class DataService:
         data = {}
         if 'data' in kwds:
             data = kwds['data']
-        
+
         return FUNCTIONS[method](URL + url, params=params, json=data)
 
     @staticmethod

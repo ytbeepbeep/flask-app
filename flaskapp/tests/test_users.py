@@ -7,6 +7,7 @@ import os
 DATASERVICE = os.environ['DATA_SERVICE']
 
 
+
 def test_create_user(client):
     tested_app, app = client
 
@@ -86,7 +87,9 @@ def test_delete_user(client):
     assert reply.status_code == 401
 
     # post correct password and checking that the user has been deleted
-    reply = tested_app.post('/delete_user', data=dict(password='123456'), follow_redirects=True)
+    with requests_mock.mock() as m:
+        m.delete(DATASERVICE + '/users/1')
+        reply = tested_app.post('/delete_user', data=dict(password='123456'), follow_redirects=True)
     assert reply.status_code == 200
 
     # TODO add after relavant parts are implemented

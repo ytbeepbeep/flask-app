@@ -8,7 +8,6 @@ from flaskapp.database import db
 run = Blueprint('run', __name__)
 
 
-
 @run.route('/run/<id>', methods=['GET'])
 @login_required
 def get_run(id):

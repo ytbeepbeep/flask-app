@@ -68,7 +68,9 @@ def delete_user():
     if request.method == 'POST':
         if form.validate_on_submit():
             if current_user.authenticate(form.password.data) and hasattr(current_user, 'dataservice_user_id'):
-                reply = requests.delete(DATASERVICE + '/users/' + str(current_user.dataservice_user_id))
+
+                reply = DataService.delete(url="/users/%s" % current_user.dataservice_user_id, params={})
+
                 if reply.status_code == 200:
                     db.session.delete(current_user)
                     db.session.commit()

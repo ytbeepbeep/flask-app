@@ -8,8 +8,6 @@ from flaskapp.auth import strava_auth_url
 from flaskapp.services import DataService
 
 import os
-import requests
-
 
 auth = Blueprint('auth', __name__)
 
@@ -32,7 +30,7 @@ def _strava_auth():  # pragma: no cover
 
     # print('uise: ', access_token)
 
-    if 'access_token' in access_token: # compatibility with stravalib 10
+    if 'access_token' in access_token:  # compatibility with stravalib 0.10
         access_token = access_token['access_token']
 
     reply = DataService().post('/users/%s'%str(user_id), data={'strava_token': access_token})
