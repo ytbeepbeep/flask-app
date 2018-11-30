@@ -90,7 +90,8 @@ def create_challenge():
                 flash('The run/s do not exist or are the same', category='error')
                 status = reply_run_1.status_code
                 return render_template('create_challenge.html', runs=runs, form=form), status
-            elif reply_run_2.status_code is not 200:
+           
+            if reply_run_2.status_code is not 200:
                 flash('The run/s do not exist or are the same', category='error')
                 status = reply_run_2.status_code
                 return render_template('create_challenge.html', runs=runs, form=form), status
