@@ -93,6 +93,7 @@ class Objective(db.Model): # pragma: no cover
         return res
 
 
+# DO NOT INSERT USER IN THIS DB! THIS SERVES ONLY TO SHORTEN CODE IN SOME SITUATION. E.G. LIKE Objective CREATION
 class Challenge(db.Model): # pragma: no cover
     __tablename__ = 'challenge'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -128,6 +129,7 @@ class Challenge(db.Model): # pragma: no cover
         return res
 
 
+# DO NOT INSERT USER IN THIS DB! THIS SERVES ONLY TO SHORTEN CODE IN SOME SITUATION. E.G. LIKE Objective CREATION
 class Report(db.Model):  # pragma: no cover
     __tablename__ = 'report'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

@@ -21,9 +21,9 @@ def challenge_details(id):
     win_avg_speed = ""
     challenge_reply = requests.get(url="%s/challenges/%s" % (CHAL_SERVICE_URL, id), params={'user_id': current_user.dataservice_user_id})
 
-    if challenge_reply.status_code is 404:
+    if challenge_reply.status_code is 404: # pragma: no cover
         abort(404)
-    elif challenge_reply.status_code is not 200:
+    elif challenge_reply.status_code is not 200: # pragma: no cover
         abort(500)
 
     challenge = challenge_reply.json()
@@ -31,9 +31,9 @@ def challenge_details(id):
     run_one_reply = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, challenge["run_one"]), params={'user_id': current_user.dataservice_user_id})
     run_two_reply = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, challenge["run_two"]), params={'user_id': current_user.dataservice_user_id})
 
-    if run_one_reply.status_code is not 200:
+    if run_one_reply.status_code is not 200: # pragma: no cover
         abort(503)
-    if run_two_reply.status_code is not 200:
+    if run_two_reply.status_code is not 200: # pragma: no cover
         abort(500)
 
     run_one = run_one_reply.json()
@@ -71,7 +71,7 @@ def create_challenge():
     
     runs_reply = requests.get("%s/runs" % (DATA_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
 
-    if runs_reply.status_code is not 200:
+    if runs_reply.status_code is not 200: # pragma: no cover
         abort(504)
 
     runs = runs_reply.json()
@@ -89,8 +89,7 @@ def create_challenge():
                 flash('The run/s do not exist or are the same', category='error')
                 status = reply_run_1.status_code
                 return render_template('create_challenge.html', runs=runs, form=form), status
-
-            if reply_run_2.status_code is not 200:
+            elif reply_run_2.status_code is not 200:
                 flash('The run/s do not exist or are the same', category='error')
                 status = reply_run_2.status_code
                 return render_template('create_challenge.html', runs=runs, form=form), status
@@ -121,10 +120,10 @@ def page_challenge():
 
     reply = requests.get(url="%s/challenges" % (CHAL_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
 
-    if reply.status_code is 404:
+    if reply.status_code is 404: # pragma: no cover
         flash('You do not have any challenge', category='error')
         status = 404
-    elif reply.status_code is not 200:
+    elif reply.status_code is not 200: # pragma: no cover
         flash('Server error', category='error')
         status = 500
     else:
