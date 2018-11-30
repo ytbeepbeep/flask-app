@@ -20,7 +20,6 @@ DATASERVICE = os.environ['OBJECTIVE_SERVICE']
 def _objectives():
     reply = requests.get(DATASERVICE + '/objectives?user_id=' + str(current_user.dataservice_user_id))
     if reply.status_code == 200:
-        print("list of objectives:", reply.json())
         return render_template("objectives.html", objectives=reply.json())
     else:
         return render_template("objectives.html")
