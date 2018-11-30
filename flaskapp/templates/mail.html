@@ -15,14 +15,14 @@
     <div class="container-fluid">
         <ul class="nav nav-pills nav-stacked" role="tablist">
             <h2>Beep Beep</h2>
-            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/">Home</a></li>
             <li><a href="/create_objective">Create Objective</a></li>
             <li><a href="/objectives">List Objectives</a></li>
             <li><a href="/create_challenge">Create Challenge</a></li>
             <li><a href="/challenges">Challenges</a></li>
             <li><a href="/statistics">Statistics</a></li>
-            <li><a href="/frequency">Setting Report</a></li>
-            {% if user.is_admin %}
+            <li class="active"><a href="/frequency">Setting Report</a></li>
+            {% if current_user.is_admin %}
             <li><a href="/users"><span class="glyphicon glyphicon-user"></span>Users list</a></li>
             {% endif %}
             <li><a href="/delete_user"><span class="glyphicon glyphicon-user"></span>Delete User</a></li>
@@ -30,32 +30,19 @@
         </ul>
     </div>
     <div class="container">
-        <h1 id="title" class="titlepage">Hi {{ user.firstname }}</h1>
-        {% if not credential.authorized_strava %}
-        <p><a id="strava_auth_btn" class="btn btn-primary" href="{{strava_auth_url}}">Authorize Strava Access</a></p>
-        {% else %}
-        <h3>Your last 10 runs</h3><br>
-        <table>
-            <tr>
-                <td class="key">Average speed: </td>
-                <td class="value"><span id="total_average_speed">{{total_average_speed}}</span></td>
-            </tr>
-        </table>
-        <br> {% for run in runs %}
-        <p class="listrun"><a id="run_{{run.id}}" class="list" href="/run/{{run.id}}">{{run.title}}</a></p>
-        {% endfor %}
+        <h1 class="titlepage">Beep Beep Setting Mail</h1>
+        <form class="form-app" action="" method="POST">
+            {{ form.hidden_tag() }} {{ form.setting_mail }}
+            <input class="btn btn-lg btn-primary btn-block" type=submit value=Send>
+            <p class="success">
+                {% for success in get_flashed_messages(False,['success']) %}
+                <br>{{ success }} {% endfor%}</p>
+            <p class="error">
+                {% for error in get_flashed_messages(False,['error']) %}
+                <br>{{ error }} {% endfor%}</p>
+        </form>
     </div>
-    {% endif %} {% else %}
-    <form class="form-app">
-        <div class="text-center mb-4">
-            <h1 class="h3 mb-3 font-weight-normal">Beep Beep</h1>
-            <h4>Hi Anonymous!</h4>
-        </div>
-        <br>
-        <a class="btn btn-lg btn-primary btn-block" href="/login">Log in</a>
-        <a class="btn btn-lg btn-primary btn-block" href="/create_user">Sign up</a>
-    </form>
-    <br> {% endif %}
+    {% endif %}
 </body>
 
 </html>

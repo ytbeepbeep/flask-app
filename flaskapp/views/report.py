@@ -14,17 +14,21 @@ MAIL_SERVICE_URL = os.environ['MAIL_SERVICE']
 
 
 # In this we specify the setting for the management of the report
-@report.route('/frequency/<user_id>', methods=['GET', 'POST'])
+@report.route('/frequency', methods=['GET', 'POST'])
 @login_required
 def settingreport():
+    status = 200
     form = MailForm()
-    if request.method == 'GET':
-        requests.get(url="%s/frequency" % (MAIL_SERVICE_URL), params={'user_id': current_user.dataservice_user_id})
     if request.method == 'POST':
-        freq = request.form['setting_mail']
-        # MISS PARSING OF THE FREQUENCY
-        # print(freq)
-        reply = requests.post(url="%s/frequency/", data={'user_id': current_user.dataservice_user_id, 'frequency': freq})  # wrong here
-        if reply.status_code == 200:
-            flash('Settings updated', category='success')
-    return render_template('mail.html', form=form)
+        if form.validate_on_submit():
+            choice = request.form['setting_mail']
+
+            freq = (float(choice) * 3600.0)
+            reply = requests.post(url="%s/frequency/%s" % (MAIL_SERVICE_URL, current_user.dataservice_user_id), json={'frequency': freq})
+            if reply.status_code is 200:
+                flash('Settings updated', category='success')
+            else:
+                flash('An error occurred while setting frequency', category='error')
+                status = 500
+    return render_template('mail.html', form=form), status
+

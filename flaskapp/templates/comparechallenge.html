@@ -17,7 +17,7 @@
             <h2>Beep Beep</h2>
             <li><a href="/">Home</a></li>
             <li><a href="/create_objective">Create Objective</a></li>
-            <li class="active"><a href="/objectives">List Objectives</a></li>
+            <li><a href="/objectives">List Objectives</a></li>
             <li><a href="/create_challenge">Create Challenge</a></li>
             <li><a href="/challenges">Challenges</a></li>
             <li><a href="/statistics">Statistics</a></li>
@@ -30,46 +30,40 @@
         </ul>
     </div>
     <div class="container">
-        <h1 class="titlepage">Objectives</h1>
-        {% for objective in objectives: %}
+        <h1 class="titlepage">Challenge runs</h1>
         <table>
             <tr>
-                <td class="key">Name: </td>
+                <td></td>
                 <td class="value">
-                    <p id="objective_{{objective.id}}_name">{{objective.name}}</p>
+                    <p>{{ run_one.id }} {{ run_one.title }}</p>
                 </td>
+                <td class="value">{{ run_two.id }} {{ run_two.title }}</td>
             </tr>
             <tr>
-                <td class="key">Start date: </td>
+                <td class="key">Distance: </td>
                 <td class="value">
-                    <p id="objective_{{objective.id}}_start_date">{{objective.start_date}}</p>
+                    <p>{{ run_one.distance }}</p>
                 </td>
+                <td class="value">{{run_two.distance }}</td>
             </tr>
             <tr>
-                <td class="key">End date: </td>
+                <td class="key">Elapsed_time: </td>
                 <td class="value">
-                    <p id="objective_{{objective.id}}_end_date">{{objective.end_date}}</p>
-                </td>
+                    <p>{{ run_one.elapsed_time }}</p>
+                    <td class="value">{{ run_two.elapsed_time }}</td>
             </tr>
             <tr>
-                <td class="key">Target distance: </td>
+                <td class="key">Avg_speed: </td>
                 <td class="value">
-                    <p id="objective_{{objective.id}}_target_distance">{{objective.target_distance}}</p>m</td>
+                    <p>{{ run_one.average_speed }}</p>m/s</td>
+                <td class="value">{{ run_two.average_speed }}</td>
             </tr>
-            <tr>
-                <td class="key">Completion: </td>
-                <td class="value">
-                    <p id="objective_{{objective.id}}_completion">{{objective.completion}}</p>%</td>
-            </tr>
-            {% if current_user.is_admin %}
-            <tr>
-                <td class="key">Runner id: </td>
-                <td class="value">
-                    <p id="objective_{{objective.id}}_runner_id">{{objective.runner.id}}</p>
-                </td>
-            </tr>
-            {% endif %}
-        </table><br> {% endfor %} {% endif %}
+        </table><br>
+        <p>{{ win_avg_speed }}</p><br>
+        <p>{{ win_distance }}</p><br>
+        <p>{{ win_time }}</p><br>
+    </div>
+    {% endif %}
 </body>
 
 </html>
