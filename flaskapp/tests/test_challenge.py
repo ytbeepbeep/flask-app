@@ -50,6 +50,7 @@ challenge = {
     "name_run_two": "test_run_two"
 }
 
+
 def test_run(client):
     tested_app, app = client
 
@@ -75,7 +76,6 @@ def test_run(client):
         reply = tested_app.get('/run/4')
         assert reply.status_code == 500
 
-
         m.get(CHALLENGESERVICE + '/challenges?user_id=1', json=challenge)
         reply = tested_app.get('/challenges?user_id=1')
         assert reply.status_code == 200
@@ -92,6 +92,8 @@ def test_run(client):
         reply = tested_app.post('/challenges', json=user)
         assert reply.status_code == 405
 
+        m.get(CHALLENGESERVICE + '/challenges/1?user_id=1', json=challenge)
+        assert tested_app.get('/challenges/1').status_code == 200
 
 
 def test_challenge_not_found(client):

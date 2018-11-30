@@ -87,8 +87,6 @@ def test_view_objectives(client):
             # assert tested_app.get('/objectives', follow_redirects=True).status_code == 200
 
 
-
-
         # retrieve the objective table
         objectives = db.session.query(Objective) 
 

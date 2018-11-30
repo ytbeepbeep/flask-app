@@ -21,12 +21,13 @@ def challenge_details(id):
     win_avg_speed = ""
     challenge_reply = requests.get(url="%s/challenges/%s" % (CHAL_SERVICE_URL, id), params={'user_id': current_user.dataservice_user_id})
 
-    if challenge_reply.status_code is 404: # pragma: no cover
+    if challenge_reply.status_code is 404:  # pragma: no cover
         abort(404)
     elif challenge_reply.status_code is not 200: # pragma: no cover
         abort(500)
 
     challenge = challenge_reply.json()
+    print(challenge)
 
     run_one_reply = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, challenge["run_one"]), params={'user_id': current_user.dataservice_user_id})
     run_two_reply = requests.get(url="%s/runs/%s" % (DATA_SERVICE_URL, challenge["run_two"]), params={'user_id': current_user.dataservice_user_id})
