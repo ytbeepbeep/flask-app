@@ -17,6 +17,7 @@ MAIL_SERVICE_URL = os.environ['MAIL_SERVICE']
 @report.route('/frequency', methods=['GET', 'POST'])
 @login_required
 def settingreport():
+    status = 200
     form = MailForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -24,9 +25,10 @@ def settingreport():
 
             freq = (float(choice) * 3600.0)
             reply = requests.post(url="%s/frequency/%s" % (MAIL_SERVICE_URL, current_user.dataservice_user_id), json={'frequency': freq})
-            if reply.status_code == 200:
+            if reply.status_code is 200:
                 flash('Settings updated', category='success')
             else:
                 flash('An error occurred while setting frequency', category='error')
-    return render_template('mail.html', form=form)
+                status = 500
+    return render_template('mail.html', form=form), status
 
